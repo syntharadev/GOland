@@ -1,0 +1,5 @@
+.git
+.env
+goland.db
+ui/node_modules/
+*.md

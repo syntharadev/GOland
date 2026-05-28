@@ -1,0 +1,14 @@
+# Archivos de entorno
+.env
+
+# Bases de datos locales
+*.db
+*.sqlite
+goland.db
+
+# Binarios compilados
+goland-server
+*.exe
+
+# Dependencias (si usaras Node en el frontend)
+node_modules/
