@@ -1,5 +1,5 @@
 # ETAPA 1: Construcción (Builder)
-FROM golang:1.22-alpine AS builder
+FROM golang:1.26-alpine AS builder
 
 # Configurar el directorio de trabajo
 WORKDIR /app
