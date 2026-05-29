@@ -1,5 +1,5 @@
 # ETAPA 1: Construcción (Builder)
-FROM golang:1.26-alpine AS builder
+FROM golang:1.26.3-alpine AS builder
 
 # Configurar el directorio de trabajo
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copiar el código fuente completo
+# Copiar el código fuente completo (¡Todo en una sola línea!)
 COPY . .
 
 # Compilar el binario estático sin dependencias C (CGO_ENABLED=0)
@@ -24,7 +24,6 @@ WORKDIR /root/
 
 # Copiar el binario compilado desde la etapa builder
 COPY --from=builder /app/goland-server .
-
 # Copiar la carpeta estática del frontend (Agentic UI)
 COPY --from=builder /app/ui ./ui
 
