@@ -8,7 +8,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copiar el código fuente completo (¡Todo en una sola línea!)
+# Copiar el código fuente completo
 COPY . .
 
 # Compilar el binario estático sin dependencias C (CGO_ENABLED=0)
