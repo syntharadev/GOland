@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
-	"gemini-go-platform/internal/db"
+	"gemini-go-platform/internal/database"
 	"gemini-go-platform/internal/llm"
 	"github.com/gorilla/websocket"
 )
@@ -15,7 +16,17 @@ import (
 func TestSwarmConnectionHandler(t *testing.T) {
 	// Create mock gemini client
 	geminiClient, _ := llm.InitClient(context.Background())
-	database, _ := db.InitDB("file::memory:?cache=shared")
+	
+	dbConn := os.Getenv("DATABASE_URL")
+	if dbConn == "" {
+		t.Skip("Saltando test de websocket porque DATABASE_URL no está configurada")
+		return
+	}
+	
+	database, err := database.InitDB(dbConn)
+	if err != nil {
+		t.Fatalf("No se pudo iniciar base de datos Supabase: %v", err)
+	}
 	defer database.Close()
 	
 	// Create a test server with our handler wrapper

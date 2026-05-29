@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"gemini-go-platform/internal/db"
+	"gemini-go-platform/internal/database"
 	"gemini-go-platform/internal/llm"
 	"github.com/gorilla/websocket"
 )
@@ -32,7 +32,7 @@ type MensajeEntrante struct {
 }
 
 // SwarmConnectionHandler ahora recibe el cliente Gemini y DB como dependencia
-func SwarmConnectionHandler(w http.ResponseWriter, r *http.Request, gemini *llm.GeminiClient, database *db.Repository) {
+func SwarmConnectionHandler(w http.ResponseWriter, r *http.Request, gemini *llm.GeminiClient, database *database.Repository) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Printf("Error WebSocket: %v", err)

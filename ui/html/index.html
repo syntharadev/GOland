@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOland - Agentic UI</title>
+    <!-- Importación de Fuentes Google (Quicksand & JetBrains Mono) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    
+    <!-- Enlace al nuevo estilo Ciber-Zen con Glassmorphism -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Panel 1: Protocolo de Ingreso y Narrativa -->
+        <div class="panel panel-cristal panel-narrativa" tabindex="1">
+            <h2>🗺️ Protocolo de Ingreso</h2>
+            <div id="auth-section" style="margin-bottom: 15px; text-align: center;">
+                <a href="/auth/google/login" id="btn-google-login" style="display:inline-block; background:#ea4335; color:white; padding:10px 20px; border-radius:12px; text-decoration:none; font-weight:bold; font-family:'Quicksand',sans-serif;">Entrar con Google</a>
+                <div id="auth-status" style="margin-top: 10px; color: #10b981; display: none; font-weight: bold;"></div>
+            </div>
+            <div class="setup-form" id="setup-form" style="display: none;">
+                <select id="nivel-previo" style="background:#0f172a; color:#f8fafc; border:1px solid rgba(255,255,255,0.08); padding:12px; border-radius:12px; font-family:'Quicksand',sans-serif;">
+                    <option value="Principiante">Principiante (0 experiencia en Go)</option>
+                    <option value="Intermedio">Intermedio (Conozco la sintaxis básica)</option>
+                    <option value="Experto">Experto (Quiero retos de concurrencia/arquitectura)</option>
+                </select>
+                <input type="text" id="dominio" placeholder="Ámbito (Ej. Medicina, Ciberseguridad...)" required style="border-radius:12px; font-family:'Quicksand',sans-serif;">
+                <input type="text" id="objetivo" placeholder="Objetivo (Ej. Analizar ADN, Crear Malware...)" required style="border-radius:12px; font-family:'Quicksand',sans-serif;">
+                <button id="btn-init" style="border-radius:12px;">Inicializar Misión</button>
+            </div>
+            <div id="narrativa-output" class="content-area"></div>
+        </div>
+
+        <!-- Panel 2: Terminal de Operaciones -->
+        <div class="panel panel-cristal panel-terminal" tabindex="2">
+            <h2>📟 Terminal del Consejo</h2>
+            <div id="terminal-logs" class="terminal-area">
+                <div class="log-line system">Esperando credenciales de usuario...</div>
+            </div>
+        </div>
+
+        <!-- Panel 3: Consejo de GOnions -->
+        <div class="panel panel-cristal panel-agentes" tabindex="3">
+            <h2>👥 Consejo GOnion</h2>
+            <div id="agentes-container" class="agentes-grid"></div>
+        </div>
+
+        <!-- Panel 4: Editor de Código / Estación de Desarrollo -->
+        <div class="panel panel-cristal panel-editor" tabindex="4">
+            <h2>💻 Estación de Desarrollo</h2>
+            <div id="instrucciones-nivel" style="margin-bottom: 10px; color: #38bdf8; font-size: 0.9rem;">
+                Las instrucciones de tu GOnion asignado aparecerán aquí...
+            </div>
+            <textarea id="codigo-editor" placeholder="// Escribe tu código Go aquí..." style="width: 100%; height: 200px; background: #020617; color: #34d399; font-family: 'JetBrains Mono', monospace; border: 1px solid rgba(255,255,255,0.08); padding: 14px; border-radius:12px;"></textarea>
+            <button id="btn-evaluar" style="margin-top: 10px; background-color: #10b981; border-radius:12px;">Enviar a Evaluación</button>
+        </div>
+    </div>
+
+    <!-- Contenedor flotante oculto para el Chat holográfico arrastrable -->
+    <div id="gomion-holograma" class="panel-cristal" style="display: none; position: absolute; bottom: 30px; right: 30px; width: 340px; height: 450px; z-index: 9999; flex-direction: column; overflow: hidden; padding: 20px; box-shadow: 0 20px 50px rgba(0, 173, 216, 0.3); border: 1px solid rgba(0, 173, 216, 0.2); background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px);">
+        <div id="gomion-holograma-header" style="cursor: move; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); font-weight: bold; font-family: 'Quicksand', sans-serif; color: var(--color-cyan-go); display: flex; justify-content: space-between; align-items: center;">
+            <span style="display: flex; align-items: center; gap: 8px;">🐹 <span>The Professor (Holograma)</span></span>
+            <button id="btn-close-holograma" style="padding: 4px 10px; border-radius: 8px; background: rgba(255,42,133,0.15); color: #ff2a85; font-size: 0.75rem; border: 1px solid rgba(255,42,133,0.3); cursor: pointer; font-family: 'Quicksand', sans-serif; font-weight: bold; transition: background 0.2s;">Apagar</button>
+        </div>
+        <div id="gomion-holograma-chat" style="flex: 1; overflow-y: auto; margin: 16px 0; font-size: 0.85rem; display: flex; flex-direction: column; gap: 10px; font-family: 'Quicksand', sans-serif; padding-right: 4px;">
+            <div style="background: rgba(0,173,216,0.1); border-left: 3px solid var(--color-cyan-go); padding: 8px 12px; border-radius: 0 8px 8px 0; color: #e2e8f0; line-height: 1.4;">
+                ¡Conexión cuántica establecida! Soy <strong>The Professor</strong>. ¿Qué misión o concepto de Go deseas descifrar? 🐹⚡
+            </div>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="holograma-input" placeholder="Comando de voz/texto..." style="flex: 1; border-radius: 10px; padding: 10px; font-size: 0.85rem; background: rgba(2,6,23,0.7); border: 1px solid rgba(255,255,255,0.08); color: #fff; font-family: 'Quicksand', sans-serif;">
+            <button id="btn-send-holograma" style="padding: 10px 16px; border-radius: 10px; font-size: 0.85rem; font-family: 'Quicksand', sans-serif; font-weight: bold; background: var(--color-cyan-go); color: var(--color-bg-space); border: none; cursor: pointer;">Enviar</button>
+        </div>
+    </div>
+
+    <!-- Enlace dinámico al WebSocket y scripts actualizados -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

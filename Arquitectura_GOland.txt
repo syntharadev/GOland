@@ -1,0 +1,29 @@
+GOland/
+├── cmd/
+│   └── server/
+│       └── main.go              # Punto de entrada y configuración del servidor web
+├── internal/                    # Lógica de backend privada (Go puro)
+│   ├── auth/                    # Lógica de Google OAuth
+│   ├── database/                # Conexión a Supabase / pgx
+│   └── websocket/               # Gestión de WebSockets para los agentes
+├── ui/                          # Capa de Presentación (Frontend)
+│   ├── html/                    # Plantillas HTML
+│   │   └── index.html           # Tu Landing Page / Dashboard base
+│   └── static/                  # Archivos públicos Ciber-Zen
+│       ├── css/                 
+│       │   └── style.css        # Tu ADN visual (Colores, Glassmorphism)
+│       ├── js/                  
+│       │   └── app.js           # Lógica frontend (Hologramas, drag & drop)
+│       └── img/                 
+│           ├── GOland.png       # Imagen isométrica (Fondo)
+│           └── Set_GOnions.png  # Sprites de los avatares
+├── docs/                        # Cerebro del proyecto (Antigravity Context)
+│   ├── Arquitectura_GOland.txt  # Este mismo archivo
+│   ├── M1_Presentacion.md
+│   ├── M2_GOmions.md
+│   ├── M3_UI_UX.md
+│   ├── M4_Documentacion.md
+│   └── M5_Comunidad.md
+├── Dockerfile                   # Receta de despliegue (Go 1.26.3)
+├── go.mod                       # Dependencias
+└── .env                         # Tus secretos locales (NUNCA SUBIR A GITHUB)

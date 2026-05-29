@@ -4,11 +4,12 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"gemini-go-platform/internal/api"
 	"gemini-go-platform/internal/auth"
-	"gemini-go-platform/internal/db"
+	"gemini-go-platform/internal/database"
 	"gemini-go-platform/internal/llm"
 )
 
@@ -20,10 +21,11 @@ func main() {
 	}
 	defer geminiClient.Close()
 
-	// Inicialización de la Base de Datos
-	database, err := db.InitDB("./goland.db")
+	// Inicialización de la Base de Datos Supabase (PostgreSQL) - NUNCA SQLite
+	dbConn := os.Getenv("DATABASE_URL")
+	database, err := database.InitDB(dbConn)
 	if err != nil {
-		log.Fatalf("Error DB: %v", err)
+		log.Fatalf("Error DB Supabase: %v", err)
 	}
 	defer database.Close()
 
@@ -44,8 +46,18 @@ func main() {
 		w.Write([]byte("GOland operativo."))
 	})
 
-	fileServer := http.FileServer(http.Dir("./ui"))
-	mux.Handle("/", fileServer)
+	// Servidor de archivos estáticos bajo la ruta web /static/
+	staticFS := http.FileServer(http.Dir("./ui/static"))
+	mux.Handle("GET /static/", http.StripPrefix("/static/", staticFS))
+
+	// Ruta raíz que sirve el archivo index.html desde su nueva ubicación
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+		http.ServeFile(w, r, "./ui/html/index.html")
+	})
 
 	server := &http.Server{
 		Addr:         ":8080",

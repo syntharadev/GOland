@@ -1,0 +1,227 @@
+/* ==========================================================================
+   🧬 ESTILOS CIBER-ZEN & KAWAII - GOLAND PLATFORM
+   ========================================================================== */
+
+:root {
+    --color-bg-abisal: #0f172a;
+    --color-bg-space: #020617;
+    --color-cyan-go: #00add8;
+    --color-neon-pink: #ff2a85;
+    --color-neon-accent: #ff9cee; /* Acento de realce Kawaii */
+    --color-text-light: #e2e8f0;
+    --color-text-dim: #94a3b8;
+    
+    /* Variables de Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-bg-hover: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border-hover: rgba(0, 173, 216, 0.4);
+    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    --glass-shadow-hover: 0 15px 35px rgba(0, 173, 216, 0.25);
+    --glass-blur: 16px;
+}
+
+/* 2. REINICIO DE ESTILOS Y BASE */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Quicksand', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--color-bg-abisal);
+    color: var(--color-text-light);
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Contenedor principal estilo cabina de control */
+.app-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+    gap: 16px;
+    background-color: var(--color-bg-space);
+}
+
+/* 3. CLASE UTILITARIA: PANEL CRISTAL (GLASSMORPHISM PREMIM) */
+.panel-cristal {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: var(--glass-shadow);
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+                border-color 0.3s ease,
+                box-shadow 0.3s ease,
+                flex 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                background 0.3s ease;
+}
+
+/* Efecto hover suave de elevación Kawaii */
+.panel-cristal:hover {
+    transform: translateY(-5px);
+    border-color: var(--glass-border-hover);
+    box-shadow: var(--glass-shadow-hover);
+    background: var(--glass-bg-hover);
+}
+
+/* 4. BASE DE LOS PANELES DE LA INTERFAZ REACTIVA */
+.panel {
+    flex: 1;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* El núcleo de Agentic UI: panel enfocado se expande fluidamente */
+.panel:hover, .panel:focus-within {
+    flex: 2.2;
+}
+
+h2 {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--color-cyan-go);
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 10px;
+    white-space: nowrap;
+}
+
+/* 5. ELEMENTOS DE FORMULARIO CIBER-ZEN */
+.setup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+input, select {
+    background-color: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--glass-border);
+    color: #f8fafc;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, select:focus {
+    border-color: var(--color-cyan-go);
+    box-shadow: 0 0 8px rgba(0, 173, 216, 0.25);
+}
+
+button {
+    background-color: var(--color-cyan-go);
+    color: var(--color-bg-space);
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+
+button:hover {
+    background-color: #00c4f7;
+    box-shadow: 0 4px 12px rgba(0, 173, 216, 0.3);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* 6. ÁREAS DE CONTENIDO Y TERMINAL */
+.content-area, .terminal-area, .agentes-grid {
+    flex: 1;
+    overflow-y: auto;
+    background-color: rgba(15, 23, 42, 0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 16px;
+}
+
+/* Terminal retro de diagnóstico */
+.terminal-area {
+    font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    color: #34d399;
+    line-height: 1.5;
+}
+
+.log-line {
+    margin-bottom: 4px;
+}
+
+.log-line.system { color: var(--color-text-dim); }
+.log-line.status { color: #f59e0b; }
+.log-line.success { color: #10b981; }
+
+.placeholder {
+    color: var(--color-text-dim);
+    font-style: italic;
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* 7. TARJETAS DE AGENTES GOMION */
+.gonion-card {
+    background-color: rgba(30, 41, 59, 0.4);
+    border-left: 4px solid var(--color-cyan-go);
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 0 16px 16px 0;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.gonion-card:hover {
+    background-color: rgba(30, 41, 59, 0.6);
+    transform: translateX(4px);
+}
+
+.gonion-card h3 {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #f8fafc;
+    margin-bottom: 6px;
+}
+
+.gonion-card .meta {
+    font-size: 0.75rem;
+    color: var(--color-text-dim);
+    margin-bottom: 8px;
+}
+
+.gonion-card .desc {
+    font-size: 0.85rem;
+    color: #cbd5e1;
+    line-height: 1.4;
+}
+
+/* Estación de código / editor */
+.panel-editor textarea {
+    width: 100%;
+    height: 200px;
+    background: #020617;
+    color: #34d399;
+    font-family: 'JetBrains Mono', monospace;
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 14px;
+    outline: none;
+    resize: none;
+    transition: border-color 0.2s;
+}
+
+.panel-editor textarea:focus {
+    border-color: var(--color-cyan-go);
+}

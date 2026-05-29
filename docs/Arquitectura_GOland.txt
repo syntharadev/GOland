@@ -1,0 +1,83 @@
+================================================================================
+🌍 ARQUITECTURA DE DIRECTORIOS - GOLAND PLATFORM MVP (SUPABASE / POSTGRESQL ONLY)
+================================================================================
+
+Este documento describe la estructura y distribución física de las carpetas y
+archivos del proyecto GOland, detallando las responsabilidades de cada capa.
+Nuestra persistencia en producción y desarrollo utiliza única y exclusivamente
+Supabase (PostgreSQL) mediante el driver pgx, eliminando por completo SQLite.
+
+--------------------------------------------------------------------------------
+📂 ÁRBOL DE DIRECTORIOS DEL PROYECTO
+--------------------------------------------------------------------------------
+
+GOland/
+├── cmd/                          # Puntos de Entrada (Entrypoints) del Sistema
+│   └── server/
+│       └── main.go               # 🎯 ENTRYPOINT PRINCIPAL DEL BACKEND GO
+├── docs/                         # Documentación de Arquitectura y Módulos
+│   └── Arquitectura_GOland.txt   # Este mapa físico y lógico del proyecto
+├── internal/                     # Capa de Lógica de Negocio (Privada/Core)
+│   ├── api/                      # Controladores de Rutas y Handlers HTTP/WebSockets
+│   │   ├── handlers.go           # Gestor del túnel WebSocket (/ws/swarm)
+│   │   └── handlers_test.go      # Pruebas unitarias de los handlers de red
+│   ├── auth/                     # Módulo de Seguridad y Autenticación
+│   │   └── google.go             # Integración y Callback de Google OAuth 2.0
+│   ├── database/                 # Módulo de Datos y Persistencia Nube (pgx)
+│   │   └── repository.go         # 🗄️ GESTIÓN EXCLUSIVA DE SUPABASE POSTGRESQL (NUNCA SQLITE)
+│   └── llm/                      # Módulo de Inteligencia Artificial (Gemini)
+│       ├── client.go             # Cliente de conexión con Google AI Studio
+│       ├── evaluator.go          # Evaluador y Sandbox Estático de código
+│       └── orchestrator.go       # Orquestador del RAG y mundos dinámicos
+├── ui/                           # Capa de Presentación (Frontend)
+│   ├── html/                     # Plantillas y Páginas HTML
+│   │   └── index.html            # 🖥️ Vista principal de la UI reactiva Ciber-Zen
+│   └── static/                   # Recursos Estáticos Públicos (Frontend Ciber-Zen)
+│       ├── css/                  # Hojas de Estilo CSS
+│       │   └── style.css         # Diseño Ciber-Zen, Glassmorphism y Kawaii
+│       ├── img/                  # Imágenes y Sprites Isométricos
+│       └── js/                   # Lógica e Interacciones del Cliente
+│           └── app.js            # Conectores WebSocket y State Machine
+├── Arquitectura.md               # Especificación en Markdown de Producción
+├── Codigos_implementados.md      # Registro de cambios de código
+├── Dockerfile                    # Receta de empaquetado multi-etapa
+├── Errores_aprendidos.md         # Bitácora de incidencias y soluciones
+├── go.mod                        # Módulo Go y dependencias
+├── go.sum                        # Sumas de verificación de dependencias
+├── GOland.png                    # Sprite isométrico del mapa de la isla
+├── M1_Presentacion.md            # Mapeo del Módulo 1 (Landing e Inicio)
+├── M2_GOmions.md                 # Mapeo del Módulo 2 (RPG y GOmions)
+├── M3_UI_UX.md                   # Mapeo del Módulo 3 (Estética y Chat)
+├── M4_Documentacion.md           # Mapeo del Módulo 4 (Academia RAG)
+├── M5_Comunidad.md               # Mapeo del Módulo 5 (Comunidad Gremio)
+├── Nuevos_Skills_dinamicos.md    # Habilidades reactivas del frontend/backend
+├── Proceso_del_desarrollo.md     # Registro histórico de fases y producción
+└── Set_GOnions.png               # Sprite unificado de los 9 GOnions
+
+--------------------------------------------------------------------------------
+💡 ARQUITECTURA LÓGICA DE CAPAS
+--------------------------------------------------------------------------------
+
+1.  ENTRYPOINT (cmd/server/main.go):
+    Arranca el servidor HTTP en el puerto :8080 con timeouts de seguridad, 
+    inicializa el cliente persistente de Gemini y establece conexión obligatoria
+    con la base de datos Supabase (PostgreSQL) a través del driver nativo pgx, 
+    inyectando las dependencias necesarias. Falla catastróficamente si no se provee
+    una DATABASE_URL válida en el entorno.
+
+2.  LÓGICA DEL SISTEMA (internal/):
+    Código privado que encapsula las funcionalidades principales.
+    - database/: Encargada de conectarse a la nube de Supabase mediante pgx y
+                 guardar de forma consistente el progreso del usuario.
+    - auth/: Encargada de redirigir, intercambiar tokens y firmar cookies seguras.
+    - llm/: Encargada de hablar con la API de Gemini 1.5, evaluar código de forma
+            estática (prevención RCE) y generar el RAG dinámico.
+    - api/: Encargada de la conexión WebSocket /ws/swarm, coordinando los payloads
+            de comunicación de los mundos.
+
+3.  PRESENTACIÓN (ui/):
+    El código visual servido al navegador.
+    - html/index.html: Estructura semántica de los paneles reactivos de cristal.
+    - static/: Carpeta pública que expone los recursos estáticos del frontend Ciber-Zen
+               (JS de control de estado, CSS de Glassmorphism e imágenes).
+================================================================================
