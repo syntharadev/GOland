@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOland - Estación de Aprendizaje Cuántico</title>
+    <!-- Importación de Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Quicksand:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Hoja de Estilos Pastel Sky -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        /* Estilos específicos complementarios del Workspace */
+        .workspace-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            color: #1e293b;
+        }
+
+        .lesson-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #334155;
+        }
+
+        .lesson-code-block {
+            background: rgba(15, 23, 42, 0.04);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 12px;
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #0f172a;
+            margin: 16px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .lesson-badge {
+            display: inline-block;
+            background: rgba(0, 173, 216, 0.1);
+            color: var(--color-cyan-go);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .workspace-editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .workspace-editor-title {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--color-cyan-go);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-textarea {
+            flex: 1;
+            width: 100%;
+            background: #ffffff;
+            color: #0f172a;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            border-radius: 16px;
+            padding: 16px;
+            outline: none;
+            resize: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+
+        .code-textarea:focus {
+            border-color: var(--color-cyan-go);
+            box-shadow: 0 0 0 3px rgba(0, 173, 216, 0.1);
+        }
+
+        .btn-evaluate-code {
+            margin-top: 14px;
+            background: linear-gradient(135deg, var(--color-neon-pink) 0%, #ff5c9f 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(255, 42, 133, 0.2);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-evaluate-code:hover {
+            background: linear-gradient(135deg, #ff5c9f 0%, var(--color-neon-pink) 100%);
+            box-shadow: 0 6px 20px rgba(255, 42, 133, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .scroll-note {
+            font-size: 0.75rem;
+            color: var(--color-text-dim);
+            text-align: right;
+            margin-top: 6px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="workspace-grid">
+        <!-- Fila superior: Contiene Lección del Profesor y Editor de Código -->
+        <div class="workspace-top-row">
+            
+            <!-- Panel del Profesor (Arriba Izquierda) -->
+            <div class="panel-profesor">
+                <div class="avatar-header">
+                    <img src="/static/img/Profesor.png" alt="Avatar del Profesor" class="avatar-img-large">
+                    <div class="avatar-info">
+                        <h3>El Profesor</h3>
+                        <span>Mentor de Sintaxis y Fundamentos de Go</span>
+                    </div>
+                </div>
+                
+                <div class="workspace-content" id="profesor-workspace-content">
+                    <div id="roadmap-container">
+                        <div style="text-align: center; padding: 50px 24px; color: var(--color-text-dim);">
+                            <span style="font-size: 3.5rem; display: block; margin-bottom: 16px;">🗺️</span>
+                            <h3 style="margin-bottom: 10px; font-family: 'Quicksand', sans-serif; font-weight: 700; color: #0f172a;">Esperando instrucciones del estudiante...</h3>
+                            <p style="font-size: 0.92rem; max-width: 380px; margin: 0 auto; line-height: 1.6; color: #475569;">Escribe en la consola inferior qué tipo de proyecto quieres construir para que el enjambre de GOnions materialice tu plan de misiones personalizado.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Panel de la Estación de Código (Arriba Derecha) -->
+            <div class="panel-editor-workspace">
+                <div class="workspace-editor-header">
+                    <div class="workspace-editor-title">
+                        <span>💻 Estación de Desarrollo</span>
+                    </div>
+                    <span style="font-size: 0.75rem; color: #10b981; font-weight: bold; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 6px;">Compilador Online</span>
+                </div>
+                
+                <textarea class="code-textarea" id="workspace-editor" placeholder="// Escribe tu código de Go aquí y presiona evaluar...
+package main
+
+import &quot;fmt&quot;
+
+func main() {
+    // Declara una variable llamada 'mensaje' con valor 'Hola GOland' usando :=
+    mensaje := &quot;Hola GOland&quot;
+    fmt.Println(mensaje)
+}"></textarea>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <button class="btn-evaluate-code" id="btn-evaluar-code">Enviar a Evaluación</button>
+                    <span class="scroll-note">Pasa el cursor para expandir el editor ⚡</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Consola y Tutor Gemini Flotante (Abajo) -->
+        <div class="panel-consola-flotante">
+            <div class="panel-consola-header">
+                <div class="consola-left">
+                    <img src="/static/img/Estudiante_1.png" alt="Avatar del Estudiante" class="consola-avatar" id="avatar-activo">
+                    <div class="consola-title">Consola del Estudiante y Gemini Tutor</div>
+                </div>
+                <span style="font-size: 0.8rem; color: var(--color-cyan-go); font-weight: 600;" id="consola-hint">⚡ Pasa el cursor por aquí para expandir el chat</span>
+            </div>
+
+            <!-- Contenedor del Chat (Mensajes dinámicos) -->
+            <div class="chat-messages-container" id="chat-history">
+                <!-- Los mensajes serán inyectados dinámicamente por ui/static/js/ecosistema.js -->
+            </div>
+
+            <!-- Área de entrada y envío -->
+            <div class="panel-consola-input-area">
+                <input type="text" class="chat-input" id="chat-input-text" placeholder="Pregúntale a tu tutor Gemini sobre Go...">
+                <button class="btn-chat-send" id="btn-send-chat">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de Interactividad con el Ecosistema y Gemini -->
+    <script src="/static/js/ecosistema.js"></script>
+</body>
+</html>

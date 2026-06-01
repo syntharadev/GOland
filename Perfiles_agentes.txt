@@ -1,0 +1,10 @@
+1. Profesor	Nivel 1 (Base)	Evalúa la sintaxis del código y da contexto general.	Líder de Frontend. Es el primero en hablar por el WebSocket al usuario.
+2. Bibliotecaria	Nivel 1 (Base)	Busca en la documentación de Go (Docs, standard library).	Soporte Pasivo. El Profesor la invoca si hay dudas sobre un paquete (fmt, net).
+3. Mensajero	Nivel 1 (Base)	Gestiona el flujo de logs y notificaciones de sistema.	Infraestructura. No evalúa código, alimenta la "Terminal de Diagnóstico".
+4. Ingeniera	Nivel 3 (Exp)	Analiza rendimiento, concurrencia (Goroutines) y memoria.	Líder Técnica. Actúa después del Profesor si el código compila bien.
+5. Constructor	Nivel 5 (Exp)	Diseña arquitectura de paquetes e interfaces sólidas.	Arquitecto. Se activa en proyectos multi-archivo. Ignora scripts simples.
+6. Cronometradora	Nivel 10 (Exp)	Especialista extremo en Big O notation y optimización de latencia.	Auditora Final. Turno de cierre. Solo habla si el código es ineficiente.
+7. Hacker	Logro Oculto	Enseña atajos, trucos no documentados y one-liners.	Interrupción Aleatoria. Puede saltarse su turno para dar un "Tip" rápido.
+8. Senior	Logro: Foro	Revisa las convenciones de nomenclatura (Effective Go).	Mentora. Comenta junto al Profesor sobre estilo, no sobre compilación.
+9. Guardiana	Logro: Tests	Crea casos extremos (Edge cases) y rompe tu código.	Control de Calidad. Bloquea el progreso hasta que tu código pase sus tests.
+

@@ -3,22 +3,22 @@
    ========================================================================== */
 
 :root {
-    --color-bg-abisal: #0f172a;
-    --color-bg-space: #020617;
+    --color-bg-abisal: #e0f2fe; /* Azul cielo suave */
+    --color-bg-space: #f8fafc; /* Blanco pizarra */
     --color-cyan-go: #00add8;
     --color-neon-pink: #ff2a85;
     --color-neon-accent: #ff9cee; /* Acento de realce Kawaii */
-    --color-text-light: #e2e8f0;
-    --color-text-dim: #94a3b8;
+    --color-text-light: #0f172a; /* Slate 900 */
+    --color-text-dim: #475569; /* Slate 600 */
     
-    /* Variables de Glassmorphism */
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-bg-hover: rgba(255, 255, 255, 0.06);
-    --glass-border: rgba(255, 255, 255, 0.08);
+    /* Variables de Glassmorphism Pastel */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-bg-hover: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(14, 165, 233, 0.12);
     --glass-border-hover: rgba(0, 173, 216, 0.4);
-    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-    --glass-shadow-hover: 0 15px 35px rgba(0, 173, 216, 0.25);
-    --glass-blur: 16px;
+    --glass-shadow: 0 8px 32px rgba(14, 165, 233, 0.08);
+    --glass-shadow-hover: 0 12px 40px rgba(14, 165, 233, 0.15);
+    --glass-blur: 12px;
 }
 
 /* 2. REINICIO DE ESTILOS Y BASE */
@@ -30,7 +30,7 @@
 
 body {
     font-family: 'Quicksand', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--color-bg-abisal);
+    background: linear-gradient(135deg, var(--color-bg-space) 0%, var(--color-bg-abisal) 100%);
     color: var(--color-text-light);
     height: 100vh;
     overflow: hidden;
@@ -43,7 +43,7 @@ body {
     height: 100%;
     padding: 16px;
     gap: 16px;
-    background-color: var(--color-bg-space);
+    background: transparent;
 }
 
 /* 3. CLASE UTILITARIA: PANEL CRISTAL (GLASSMORPHISM PREMIM) */
@@ -103,9 +103,9 @@ h2 {
 }
 
 input, select {
-    background-color: rgba(15, 23, 42, 0.6);
+    background-color: rgba(255, 255, 255, 0.85);
     border: 1px solid var(--glass-border);
-    color: #f8fafc;
+    color: #1e293b;
     padding: 12px;
     border-radius: 12px;
     font-size: 0.9rem;
@@ -120,7 +120,7 @@ input:focus, select:focus {
 
 button {
     background-color: var(--color-cyan-go);
-    color: var(--color-bg-space);
+    color: #ffffff;
     font-family: 'Quicksand', sans-serif;
     font-weight: 700;
     border: none;
@@ -225,3 +225,414 @@ button:active {
 .panel-editor textarea:focus {
     border-color: var(--color-cyan-go);
 }
+
+/* 8. BOTÓN KAWAII - ESTILO PREMIUM GOLAND */
+.boton-kawaii {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--color-neon-pink) 0%, var(--color-neon-accent) 100%);
+    color: #ffffff;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 12px 24px;
+    border-radius: 50px;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(255, 42, 133, 0.4), 
+                inset 0 -2px 0px rgba(0, 0, 0, 0.15),
+                inset 0 2px 0px rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.boton-kawaii:hover {
+    transform: scale(1.06) translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 42, 133, 0.6),
+                inset 0 -2px 0px rgba(0, 0, 0, 0.15),
+                inset 0 2px 0px rgba(255, 255, 255, 0.4);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.boton-kawaii:active {
+    transform: scale(0.96) translateY(1px);
+    box-shadow: 0 3px 10px rgba(255, 42, 133, 0.4);
+}
+
+/* ==========================================================================
+   🌐 LAYOUT WORKSPACE GRID & CONSOLA FLOTANTE - PASTEL SKY
+   ========================================================================== */
+
+.workspace-grid {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    padding: 16px;
+    gap: 16px;
+    background: linear-gradient(135deg, var(--color-bg-space) 0%, var(--color-bg-abisal) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.workspace-top-row {
+    display: flex;
+    gap: 16px;
+    height: calc(100vh - 108px); /* Dejar espacio para la consola minimizada */
+    width: 100%;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Panel Profesor (Arriba Izquierda) */
+.panel-profesor {
+    flex: 1.2;
+    transition: flex 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    display: flex;
+    flex-direction: column;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: var(--glass-shadow);
+    overflow-y: auto;
+}
+
+.panel-profesor:hover {
+    background: var(--glass-bg-hover);
+    border-color: rgba(0, 173, 216, 0.2);
+}
+
+.avatar-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.avatar-img-large {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 3px solid var(--color-cyan-go);
+    background: #ffffff;
+    object-fit: cover;
+    box-shadow: 0 4px 15px rgba(0, 173, 216, 0.15);
+}
+
+.avatar-info h3 {
+    margin: 0;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.2rem;
+    color: var(--color-text-light);
+}
+
+.avatar-info span {
+    font-size: 0.8rem;
+    color: var(--color-text-dim);
+}
+
+/* Panel Editor (Arriba Derecha) */
+.panel-editor-workspace {
+    flex: 0.8;
+    transition: flex 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    display: flex;
+    flex-direction: column;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: var(--glass-shadow);
+    overflow: hidden;
+}
+
+/* Al hacer hover, el editor se expande fluidamente */
+.panel-editor-workspace:hover,
+.panel-editor-workspace:focus-within {
+    flex: 1.5;
+    background: var(--glass-bg-hover);
+    border-color: rgba(0, 173, 216, 0.2);
+}
+
+/* Panel Consola / Chat Gemini (Flotante) */
+.panel-consola-flotante {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    height: 60px; /* Altura minimizada por defecto */
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(14, 165, 233, 0.15);
+    border-radius: 24px;
+    box-shadow: 0 4px 20px rgba(14, 165, 233, 0.06);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 12px 24px;
+}
+
+/* Al hacer hover o enfocar, flota hacia arriba sobre el resto del contenido */
+.panel-consola-flotante:hover,
+.panel-consola-flotante:focus-within {
+    height: 380px; /* Altura expandida */
+    bottom: 16px;
+    box-shadow: 0 10px 40px rgba(14, 165, 233, 0.16);
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(0, 173, 216, 0.3);
+}
+
+.panel-consola-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 36px;
+    min-height: 36px;
+    width: 100%;
+}
+
+.consola-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.consola-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--color-cyan-go);
+    background: #ffffff;
+    object-fit: cover;
+}
+
+.consola-title {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-cyan-go);
+}
+
+/* Área de Mensajes del Chat */
+.chat-messages-container {
+    flex: 1;
+    overflow-y: auto;
+    margin: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Habilitar interactividad y visibilidad en hover */
+.panel-consola-flotante:hover .chat-messages-container,
+.panel-consola-flotante:focus-within .chat-messages-container {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.chat-bubble {
+    display: flex;
+    gap: 12px;
+    max-width: 75%;
+    align-items: flex-start;
+    animation: chatFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.chat-bubble.left {
+    align-self: flex-start;
+}
+
+.chat-bubble.right {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.chat-avatar-thumb {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0, 173, 216, 0.2);
+    background: #ffffff;
+    object-fit: cover;
+}
+
+.chat-bubble-content {
+    background: rgba(240, 249, 255, 0.9);
+    border: 1px solid rgba(14, 165, 233, 0.1);
+    border-radius: 0 18px 18px 18px;
+    padding: 10px 16px;
+    color: #1e293b;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.01);
+}
+
+.chat-bubble.right .chat-bubble-content {
+    background: var(--color-cyan-go);
+    color: #ffffff;
+    border: none;
+    border-radius: 18px 0 18px 18px;
+    box-shadow: 0 4px 12px rgba(0, 173, 216, 0.2);
+}
+
+/* Controles de Entrada al final de la Consola */
+.panel-consola-input-area {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    align-items: center;
+    border-top: 1px solid var(--glass-border);
+    padding-top: 12px;
+}
+
+.chat-input {
+    flex: 1;
+    background: #ffffff;
+    border: 1px solid rgba(14, 165, 233, 0.2);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    color: #1e293b;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.chat-input:focus {
+    border-color: var(--color-cyan-go);
+    box-shadow: 0 0 0 3px rgba(0, 173, 216, 0.1);
+}
+
+.btn-chat-send {
+    background: var(--color-cyan-go);
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-chat-send:hover {
+    background: #00c4f7;
+    transform: translateY(-1px);
+}
+
+@keyframes chatFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilos para burbujas con nombre de agente */
+.chat-bubble-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.chat-bubble-agent-name {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--color-cyan-go);
+    margin-bottom: 3px;
+    margin-left: 48px; /* Alinear con el texto, al lado del avatar circular */
+    font-family: 'Quicksand', sans-serif;
+}
+
+.chat-bubble.right .chat-bubble-agent-name {
+    margin-left: 0;
+    margin-right: 48px;
+    text-align: right;
+}
+
+/* --- CLASES DE LAS MISIONES DE ROADMAP --- */
+.roadmap-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+    width: 100%;
+}
+
+.mision-card {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1.5px solid rgba(14, 165, 233, 0.12);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.03);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    animation: missionFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.mision-card:hover {
+    transform: translateY(-2.5px);
+    background: #ffffff;
+    border-color: var(--color-cyan-go);
+    box-shadow: 0 8px 24px rgba(0, 173, 216, 0.12);
+}
+
+.mision-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.mision-titulo {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #0f172a;
+}
+
+.mision-concepto {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--color-cyan-go);
+    background: rgba(0, 173, 216, 0.08);
+    padding: 2px 8px;
+    border-radius: 6px;
+    align-self: flex-start;
+}
+
+.mision-desc {
+    font-size: 0.8rem;
+    color: #475569;
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+.mision-right {
+    font-size: 1.3rem;
+    color: var(--color-cyan-go);
+    transition: transform 0.2s ease;
+}
+
+.mision-card:hover .mision-right {
+    transform: translateX(4px);
+}
+
+@keyframes missionFadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+

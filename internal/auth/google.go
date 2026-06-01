@@ -46,21 +46,21 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	// 1. Validar estado (CSRF protection)
 	oauthState, _ := r.Cookie("oauthstate")
 	if r.FormValue("state") != oauthState.Value {
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
 	}
 
 	// 2. Intercambiar código por Token
 	token, err := googleOauthConfig.Exchange(context.Background(), r.FormValue("code"))
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
 	}
 
 	// 3. Obtener datos del usuario
 	response, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
 	}
 	defer response.Body.Close()
@@ -80,7 +80,7 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	// OJO: Aquí deberías llamar a db.SaveProgress si es un usuario nuevo (Nivel 1)
 
 	// Redirigir al panel principal
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/app", http.StatusTemporaryRedirect)
 }
 
 // HandleAuthStatus devuelve si el usuario está autenticado y su nick
@@ -102,3 +102,14 @@ func HandleAuthStatus(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 }
+
+// HandleLogout limpia la sesión cuántica y redirige al index
+func HandleLogout(w http.ResponseWriter, r *http.Request) {
+	session, _ := Store.Get(r, "goland-session")
+	session.Values["authenticated"] = false
+	delete(session.Values, "user_nick")
+	session.Options.MaxAge = -1 // Expirar cookie inmediatamente
+	session.Save(r, w)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+}
+

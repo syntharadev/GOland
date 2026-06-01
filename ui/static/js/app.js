@@ -76,7 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             if (data.authenticated) {
                 appState.nick = data.nick;
-                document.getElementById('btn-google-login').style.display = 'none';
+                const googleBtn = document.getElementById('btn-google-login');
+                if (googleBtn) googleBtn.style.display = 'none';
                 const authStatus = document.getElementById('auth-status');
                 authStatus.innerText = `Autenticado como: ${data.nick}`;
                 authStatus.style.display = 'block';
