@@ -391,6 +391,87 @@ document.addEventListener('DOMContentLoaded', () => {
             chatHistory.appendChild(bubbleWrapper);
             scrollToBottom();
 
+            // Si el pipeline es exitoso, invocar automáticamente La Cronometradora para telemetría APM
+            if (!esError) {
+                setTimeout(async () => {
+                    const chronoLoadingId = 'loading-cronometradora-' + Date.now();
+                    const chronoWrapper = document.createElement('div');
+                    chronoWrapper.className = 'chat-bubble-wrapper';
+                    chronoWrapper.id = chronoLoadingId;
+
+                    const chronoName = document.createElement('div');
+                    chronoName.className = 'chat-bubble-agent-name';
+                    chronoName.innerText = 'La Cronometradora';
+
+                    const chronoBubble = document.createElement('div');
+                    chronoBubble.className = 'chat-bubble left';
+                    chronoBubble.innerHTML = `
+                        <img src="/static/img/Cronometradora.png" alt="La Cronometradora" class="chat-avatar-thumb" style="animation: pulse 1s infinite alternate;">
+                        <div class="chat-bubble-content" style="font-style: italic; color: #64748b;">
+                            Indexando telemetría en Elastic APM y analizando Big O... ⏱️
+                        </div>
+                    `;
+                    chronoWrapper.appendChild(chronoName);
+                    chronoWrapper.appendChild(chronoBubble);
+                    chatHistory.appendChild(chronoWrapper);
+                    scrollToBottom();
+
+                    try {
+                        const chronoRes = await fetch('/api/agentes/cronometradora', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ codigo: codigo_editor }),
+                        });
+
+                        const chronoData = await chronoRes.json();
+
+                        const chronoLoadingElem = document.getElementById(chronoLoadingId);
+                        if (chronoLoadingElem) chronoLoadingElem.remove();
+
+                        const chronoBubbleWrapper = document.createElement('div');
+                        chronoBubbleWrapper.className = 'chat-bubble-wrapper';
+
+                        const chronoNameLabel = document.createElement('div');
+                        chronoNameLabel.className = 'chat-bubble-agent-name';
+                        chronoNameLabel.innerText = 'La Cronometradora';
+
+                        const finalBubble = document.createElement('div');
+                        finalBubble.className = 'chat-bubble left';
+
+                        const styleBlue = 'background: rgba(240, 249, 255, 0.95); border: 1.5px solid rgba(56, 189, 248, 0.2); color: #0369a1;';
+
+                        let formattedChronoText = chronoData.respuesta
+                            .replace(/\n/g, '<br>')
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+                        finalBubble.innerHTML = `
+                            <img src="/static/img/Cronometradora.png" alt="La Cronometradora" class="chat-avatar-thumb">
+                            <div class="chat-bubble-content" style="${styleBlue}">${formattedChronoText}</div>
+                        `;
+
+                        chronoBubbleWrapper.appendChild(chronoNameLabel);
+                        chronoBubbleWrapper.appendChild(finalBubble);
+                        chatHistory.appendChild(chronoBubbleWrapper);
+                        scrollToBottom();
+
+                    } catch (err) {
+                        console.error('Error con La Cronometradora:', err);
+                        const chronoLoadingElem = document.getElementById(chronoLoadingId);
+                        if (chronoLoadingElem) chronoLoadingElem.remove();
+
+                        appendAgentMessage(
+                            'La Cronometradora',
+                            'No se pudo recuperar la telemetría APM de Elastic Search.',
+                            '/static/img/Cronometradora.png',
+                            false
+                        );
+                    }
+                }, 1000);
+            }
+
         } catch (error) {
             console.error('Error al ejecutar código con El Constructor:', error);
             const loadingElem = document.getElementById(loadingId);

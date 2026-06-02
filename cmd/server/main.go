@@ -86,6 +86,11 @@ func main() {
 		constructorHandler(w, r, geminiClient)
 	})
 
+	// Endpoint API para el agente La Cronometradora con Observabilidad Elastic MCP
+	mux.HandleFunc("POST /api/agentes/cronometradora", func(w http.ResponseWriter, r *http.Request) {
+		cronometradoraHandler(w, r, geminiClient)
+	})
+
 	server := &http.Server{
 		Addr:         ":8080",
 		Handler:      mux,
@@ -371,6 +376,49 @@ func constructorHandler(w http.ResponseWriter, r *http.Request, geminiClient *ll
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 }
+
+// Estructuras para el agente La Cronometradora
+type CronometradoraRequest struct {
+	Codigo string `json:"codigo"`
+}
+
+type CronometradoraResponse struct {
+	Respuesta string `json:"respuesta"`
+}
+
+// Handler para el análisis de La Cronometradora con Elastic MCP
+func cronometradoraHandler(w http.ResponseWriter, r *http.Request, geminiClient *llm.GeminiClient) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req CronometradoraRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Error decodificando JSON", http.StatusBadRequest)
+		return
+	}
+
+	// Instanciar el agente de La Cronometradora
+	agent := agents.NewCronometradoraAgent(geminiClient)
+
+	// Ejecutar análisis de rendimiento (la cual maneja el Tool Calling e interacciona con el MCP de Elastic)
+	respuesta, err := agent.AnalizarRendimiento(r.Context(), req.Codigo)
+	if err != nil {
+		log.Printf("Error en CronometradoraAgent: %v", err)
+		http.Error(w, fmt.Sprintf("Error en análisis de observabilidad: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	resp := CronometradoraResponse{
+		Respuesta: respuesta,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
+}
+
 
 
 
