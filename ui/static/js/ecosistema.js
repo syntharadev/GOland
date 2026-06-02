@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const evaluateBtn = document.getElementById('btn-evaluar-code');
     const codeEditor = document.getElementById('workspace-editor');
 
+    let hasRoadmap = false;
+
     function scrollToBottom() {
         if (chatHistory) {
             chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -49,6 +51,81 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     }, 1000);
 
+    // Función para consultar a La Bibliotecaria RAG MCP MongoDB
+    async function consultarBibliotecaria(pregunta) {
+        // Bloquear input
+        chatInput.disabled = true;
+        sendBtn.disabled = true;
+
+        // Mostrar indicador de carga animado
+        const thinkingId = 'thinking-bibliotecaria-' + Date.now();
+        const thinkingWrapper = document.createElement('div');
+        thinkingWrapper.className = 'chat-bubble-wrapper';
+        thinkingWrapper.id = thinkingId;
+
+        const nameLabel = document.createElement('div');
+        nameLabel.className = 'chat-bubble-agent-name';
+        nameLabel.innerText = 'La Bibliotecaria';
+
+        const thinkingBubble = document.createElement('div');
+        thinkingBubble.className = 'chat-bubble left';
+        thinkingBubble.innerHTML = `
+            <img src="/static/img/Bibliotecaria.png" alt="Bibliotecaria" class="chat-avatar-thumb" style="animation: pulse 1s infinite alternate;">
+            <div class="chat-bubble-content" style="font-style: italic; color: #64748b;">
+                Buscando en la base de datos de MongoDB Atlas... 📚
+            </div>
+        `;
+        thinkingWrapper.appendChild(nameLabel);
+        thinkingWrapper.appendChild(thinkingBubble);
+        chatHistory.appendChild(thinkingWrapper);
+        scrollToBottom();
+
+        try {
+            const response = await fetch('/api/agentes/bibliotecaria', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ pregunta: pregunta }),
+            });
+
+            const data = await response.json();
+
+            // Eliminar indicador
+            const thinkingElem = document.getElementById(thinkingId);
+            if (thinkingElem) thinkingElem.remove();
+
+            // Desbloquear input
+            chatInput.disabled = false;
+            sendBtn.disabled = false;
+            chatInput.focus();
+
+            // Formatear Markdown básico
+            let formattedText = data.respuesta
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code style="background: rgba(14, 165, 233, 0.08); padding: 2px 6px; border-radius: 4px; font-family: monospace;">$1</code>');
+
+            appendAgentMessage('La Bibliotecaria', formattedText, '/static/img/Bibliotecaria.png', false);
+
+        } catch (error) {
+            console.error('Error al consultar a La Bibliotecaria:', error);
+            const thinkingElem = document.getElementById(thinkingId);
+            if (thinkingElem) thinkingElem.remove();
+
+            chatInput.disabled = false;
+            sendBtn.disabled = false;
+
+            appendAgentMessage(
+                'La Bibliotecaria',
+                'Error cuántico: No se pudo conectar con la base de datos de MongoDB.',
+                '/static/img/Bibliotecaria.png',
+                false
+            );
+        }
+    }
+
     // Manejador para enviar el input del usuario
     async function handleSend() {
         const query = chatInput.value.trim();
@@ -58,7 +135,13 @@ document.addEventListener('DOMContentLoaded', () => {
         appendAgentMessage('Estudiante', query, '/static/img/Estudiante_1.png', true);
         chatInput.value = '';
 
-        // Bloquear input
+        // Si ya hay un roadmap generado, canalizar la duda directamente a La Bibliotecaria
+        if (hasRoadmap) {
+            await consultarBibliotecaria(query);
+            return;
+        }
+
+        // De lo contrario, iniciar el flujo de onboarding y generación de ruta
         chatInput.disabled = true;
         sendBtn.disabled = true;
 
@@ -104,19 +187,20 @@ document.addEventListener('DOMContentLoaded', () => {
             // Desbloquear input para futuras preguntas
             chatInput.disabled = false;
             sendBtn.disabled = false;
+            hasRoadmap = true; // El roadmap ya está disponible
 
             // Acto 4: Respuesta del enjambre orquestada por setTimeout
             // A los 500ms, la Bibliotecaria
             setTimeout(() => {
                 appendAgentMessage(
                     'La Bibliotecaria',
-                    '¡Excelente elección! He indexado la documentación necesaria en la base de datos para ese proyecto. Consúltame cuando te atasques.',
+                    '¡Excelente elección! He indexado la documentación necesaria en la base de datos para ese proyecto. Consúltalos aquí o pregúntame directamente cualquier duda que tengas sobre Go. 📚',
                     '/static/img/Bibliotecaria.png',
                     false
                 );
             }, 500);
 
-            // A los 1500ms, el Mensajero con links
+            // A los 1800ms, el Mensajero con links
             setTimeout(() => {
                 const linksHtml = `
                     ¡Paquete entregado! He interceptado estos 3 enlaces de repositorios de referencia que te servirán de inspiración:<br>
@@ -200,7 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cargar detalles de misión en el editor
     function seleccionarMision(mision, numeroMision) {
-        // Al hacer click, preparamos el editor y mandamos un mensaje del Profesor al chat
+        hasRoadmap = true; // Activar el modo RAG al interactuar con el temario
+        
         appendAgentMessage(
             'El Profesor',
             `Excelente decisión. Has seleccionado la <strong>Misión ${numeroMision}: ${mision.titulo}</strong>. Revisa la lección y pon a prueba tu código en el panel derecho. 🐹`,
@@ -222,6 +307,105 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Función para ejecutar código mediante El Constructor (GitLab CI/CD RAG)
+    async function ejecutarCodigoEstudiante() {
+        if (!codeEditor) return;
+        const codigo_editor = codeEditor.value.trim();
+
+        if (evaluateBtn) evaluateBtn.disabled = true;
+
+        // Inyectar mensaje automático del Mensajero
+        appendAgentMessage(
+            'El Mensajero',
+            'Enviando código al pipeline CI/CD de GitLab... 📦',
+            '/static/img/Mensajero.png',
+            false
+        );
+
+        // Mostrar indicador de carga animado en el chat flotante
+        const loadingId = 'loading-constructor-' + Date.now();
+        const loadingWrapper = document.createElement('div');
+        loadingWrapper.className = 'chat-bubble-wrapper';
+        loadingWrapper.id = loadingId;
+
+        const nameLabel = document.createElement('div');
+        nameLabel.className = 'chat-bubble-agent-name';
+        nameLabel.innerText = 'El Constructor';
+
+        const loadingBubble = document.createElement('div');
+        loadingBubble.className = 'chat-bubble left';
+        loadingBubble.innerHTML = `
+            <img src="/static/img/Constructor.png" alt="Constructor" class="chat-avatar-thumb" style="animation: pulse 1s infinite alternate;">
+            <div class="chat-bubble-content" style="font-style: italic; color: #64748b;">
+                Ejecutando pipeline y compilando en Go... ⚙️
+            </div>
+        `;
+        loadingWrapper.appendChild(nameLabel);
+        loadingWrapper.appendChild(loadingBubble);
+        chatHistory.appendChild(loadingWrapper);
+        scrollToBottom();
+
+        try {
+            const response = await fetch('/api/agentes/constructor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ codigo: codigo_editor }),
+            });
+
+            const data = await response.json();
+
+            // Eliminar indicador
+            const loadingElem = document.getElementById(loadingId);
+            if (loadingElem) loadingElem.remove();
+            if (evaluateBtn) evaluateBtn.disabled = false;
+
+            // Determinar si la respuesta tiene errores para aplicar el color pastel
+            const esError = data.respuesta.includes('failed') || data.respuesta.includes('Error') || data.respuesta.includes('❌');
+
+            const bubbleWrapper = document.createElement('div');
+            bubbleWrapper.className = 'chat-bubble-wrapper';
+
+            const nameLabelFinal = document.createElement('div');
+            nameLabelFinal.className = 'chat-bubble-agent-name';
+            nameLabelFinal.innerText = 'El Constructor';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'chat-bubble left';
+
+            // Resaltado de estilos según el status de compilación
+            const styleColor = esError 
+                ? 'background: rgba(254, 242, 242, 0.95); border: 1.5px solid rgba(239, 68, 68, 0.2); color: #991b1b; font-family: monospace;' 
+                : 'background: rgba(240, 253, 250, 0.95); border: 1.5px solid rgba(16, 185, 129, 0.2); color: #065f46; font-family: monospace;';
+
+            let formattedText = data.respuesta.replace(/\n/g, '<br>');
+
+            bubble.innerHTML = `
+                <img src="/static/img/Constructor.png" alt="Constructor" class="chat-avatar-thumb">
+                <div class="chat-bubble-content" style="${styleColor}">${formattedText}</div>
+            `;
+
+            bubbleWrapper.appendChild(nameLabelFinal);
+            bubbleWrapper.appendChild(bubble);
+            chatHistory.appendChild(bubbleWrapper);
+            scrollToBottom();
+
+        } catch (error) {
+            console.error('Error al ejecutar código con El Constructor:', error);
+            const loadingElem = document.getElementById(loadingId);
+            if (loadingElem) loadingElem.remove();
+            if (evaluateBtn) evaluateBtn.disabled = false;
+
+            appendAgentMessage(
+                'El Constructor',
+                'Error crítico: No se pudo conectar con el pipeline de GitLab CI/CD.',
+                '/static/img/Constructor.png',
+                false
+            );
+        }
+    }
+
     // Listeners
     if (sendBtn) sendBtn.addEventListener('click', handleSend);
     if (chatInput) {
@@ -230,9 +414,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Evaluar botón
     if (evaluateBtn) {
-        evaluateBtn.addEventListener('click', () => {
-            alert('¡Enviando código del estudiante a La Guardiana para auditoría cuántica! 🛡️\nCompilando y ejecutando suite de pruebas...');
+        evaluateBtn.addEventListener('click', ejecutarCodigoEstudiante);
+    }
+
+    // Ataque de teclado Ctrl + Enter en el Editor de Código
+    if (codeEditor) {
+        codeEditor.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                ejecutarCodigoEstudiante();
+            }
         });
     }
 });
