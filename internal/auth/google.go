@@ -80,7 +80,7 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	// OJO: Aquí deberías llamar a db.SaveProgress si es un usuario nuevo (Nivel 1)
 
 	// Redirigir al panel principal
-	http.Redirect(w, r, "/app", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/workspace", http.StatusSeeOther)
 }
 
 // HandleAuthStatus devuelve si el usuario está autenticado y su nick

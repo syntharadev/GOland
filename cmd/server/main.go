@@ -94,6 +94,12 @@ func renderIndex(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+	session, _ := auth.Store.Get(r, "goland-session")
+	authVal, ok := session.Values["authenticated"].(bool)
+	if ok && authVal {
+		http.Redirect(w, r, "/workspace", http.StatusSeeOther)
+		return
+	}
 	http.ServeFile(w, r, "./ui/html/index.html")
 }
 
@@ -102,8 +108,8 @@ func renderApp(w http.ResponseWriter, r *http.Request) {
 	session, _ := auth.Store.Get(r, "goland-session")
 	authVal, ok := session.Values["authenticated"].(bool)
 	if ok && authVal {
-		// Si está autenticado, sirve el Dashboard de la aplicación interactiva
-		http.ServeFile(w, r, "./ui/html/dashboard_GOland.html")
+		// Redirigir al workspace si ya está autenticado para romper bucles
+		http.Redirect(w, r, "/workspace", http.StatusSeeOther)
 		return
 	}
 	// Si no está autenticado, sirve la cinemática de introducción
@@ -112,11 +118,24 @@ func renderApp(w http.ResponseWriter, r *http.Request) {
 
 // Handler para la pantalla de login (Ruta /login)
 func renderLogin(w http.ResponseWriter, r *http.Request) {
+	session, _ := auth.Store.Get(r, "goland-session")
+	authVal, ok := session.Values["authenticated"].(bool)
+	if ok && authVal {
+		http.Redirect(w, r, "/workspace", http.StatusSeeOther)
+		return
+	}
 	http.ServeFile(w, r, "./ui/html/login_GOland.html")
 }
 
 // Handler para el nuevo Workspace (Ruta /workspace)
 func renderWorkspace(w http.ResponseWriter, r *http.Request) {
+	session, _ := auth.Store.Get(r, "goland-session")
+	authVal, ok := session.Values["authenticated"].(bool)
+	if !ok || !authVal {
+		// Redirigir a login si no está autenticado
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 	http.ServeFile(w, r, "./ui/html/workspace.html")
 }
 
