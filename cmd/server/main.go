@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
+	"gemini-go-platform/internal/agents"
 	"gemini-go-platform/internal/api"
 	"gemini-go-platform/internal/auth"
 	"gemini-go-platform/internal/database"
@@ -73,6 +75,11 @@ func main() {
 
 	// Endpoint API para generar rutas de misiones del enjambre
 	mux.HandleFunc("POST /api/generar-ruta", generarRutaHandler)
+
+	// Endpoint API para el agente La Bibliotecaria con RAG MCP MongoDB
+	mux.HandleFunc("POST /api/agentes/bibliotecaria", func(w http.ResponseWriter, r *http.Request) {
+		bibliotecariaHandler(w, r, geminiClient)
+	})
 
 	server := &http.Server{
 		Addr:         ":8080",
@@ -275,6 +282,49 @@ func generarRutaHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 }
+
+// Estructuras para la consulta de La Bibliotecaria
+type BibliotecariaRequest struct {
+	Pregunta string `json:"pregunta"`
+}
+
+type BibliotecariaResponse struct {
+	Respuesta string `json:"respuesta"`
+}
+
+// Handler para la consulta del agente La Bibliotecaria con RAG MCP MongoDB
+func bibliotecariaHandler(w http.ResponseWriter, r *http.Request, geminiClient *llm.GeminiClient) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req BibliotecariaRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Error decodificando JSON", http.StatusBadRequest)
+		return
+	}
+
+	// Instanciar el agente de La Bibliotecaria
+	agent := agents.NewBibliotecariaAgent(geminiClient)
+
+	// Ejecutar la consulta de documentación (la cual maneja el Tool Calling e interacciona con el MCP de MongoDB)
+	respuesta, err := agent.ConsultarDocumentacion(r.Context(), req.Pregunta)
+	if err != nil {
+		log.Printf("Error en BibliotecariaAgent: %v", err)
+		http.Error(w, fmt.Sprintf("Error procesando la consulta: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	resp := BibliotecariaResponse{
+		Respuesta: respuesta,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
+}
+
 
 
 
