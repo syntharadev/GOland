@@ -81,6 +81,11 @@ func main() {
 		bibliotecariaHandler(w, r, geminiClient)
 	})
 
+	// Endpoint API para el agente El Constructor con validación CI/CD GitLab MCP
+	mux.HandleFunc("POST /api/agentes/constructor", func(w http.ResponseWriter, r *http.Request) {
+		constructorHandler(w, r, geminiClient)
+	})
+
 	server := &http.Server{
 		Addr:         ":8080",
 		Handler:      mux,
@@ -324,6 +329,49 @@ func bibliotecariaHandler(w http.ResponseWriter, r *http.Request, geminiClient *
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 }
+
+// Estructuras para la validación de El Constructor
+type ConstructorRequest struct {
+	Codigo string `json:"codigo"`
+}
+
+type ConstructorResponse struct {
+	Respuesta string `json:"respuesta"`
+}
+
+// Handler para la validación de El Constructor con GitLab CI/CD MCP
+func constructorHandler(w http.ResponseWriter, r *http.Request, geminiClient *llm.GeminiClient) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req ConstructorRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Error decodificando JSON", http.StatusBadRequest)
+		return
+	}
+
+	// Instanciar el agente de El Constructor
+	agent := agents.NewConstructorAgent(geminiClient)
+
+	// Ejecutar la validación del código (la cual maneja el Tool Calling e interacciona con el MCP de GitLab)
+	respuesta, err := agent.ValidarCodigo(r.Context(), req.Codigo)
+	if err != nil {
+		log.Printf("Error en ConstructorAgent: %v", err)
+		http.Error(w, fmt.Sprintf("Error en validación de código: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	resp := ConstructorResponse{
+		Respuesta: respuesta,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
+}
+
 
 
 
