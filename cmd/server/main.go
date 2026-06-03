@@ -15,9 +15,16 @@ import (
 	"gemini-go-platform/internal/database"
 	"gemini-go-platform/internal/llm"
 	"gemini-go-platform/internal/mcp"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Cargar variables de entorno del archivo .env antes de cualquier inicialización
+	if err := godotenv.Load(); err != nil {
+		log.Println("Aviso: No se pudo cargar el archivo .env, usando variables del sistema.")
+	}
+
 	ctx := context.Background()
 	geminiClient, err := llm.InitClient(ctx)
 	if err != nil {

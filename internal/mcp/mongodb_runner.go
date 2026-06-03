@@ -3,26 +3,23 @@ package mcp
 import (
 	"fmt"
 	"log"
-
-	"gemini-go-platform/internal/config"
 )
 
 // ServidorMCPMongo es la instancia global del cliente MCP conectado al servidor de MongoDB
 var ServidorMCPMongo *MCPClient
 
-// IniciarServidorMCPMongo arranca el servidor MCP oficial de MongoDB como subproceso
+// IniciarServidorMCPMongo arranca el servidor MCP nativo de MongoDB como subproceso
 func IniciarServidorMCPMongo() error {
-	mongodbURI := config.GetMongoDBURI()
-	log.Printf("Iniciando Servidor MCP MongoDB con URI: %s", mongodbURI)
+	log.Println("Iniciando Servidor MCP de MongoDB en Go como subproceso...")
 
-	// Ejecutar npx -y @modelcontextprotocol/server-mongodb <MONGODB_URI>
-	client, err := IniciarMCPClient("mongodb", "npx", "-y", "@modelcontextprotocol/server-mongodb", mongodbURI)
+	// Ejecutar nuestro propio binario/fuente MCP: go run cmd/mcp-mongo/main.go
+	client, err := IniciarMCPClient("mongodb", "go", "run", "cmd/mcp-mongo/main.go")
 	if err != nil {
-		return fmt.Errorf("fallo al arrancar el servidor MCP MongoDB: %w", err)
+		return fmt.Errorf("fallo al arrancar el servidor MCP nativo de MongoDB: %w", err)
 	}
 
 	ServidorMCPMongo = client
-	log.Println("Servidor MCP de MongoDB Atlas inicializado con éxito y enlazado.")
+	log.Println("Servidor MCP nativo de MongoDB inicializado con éxito y enlazado.")
 	return nil
 }
 

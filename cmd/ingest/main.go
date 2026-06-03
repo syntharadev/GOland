@@ -15,6 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/api/option"
+	"github.com/joho/godotenv"
 )
 
 type GoDoc struct {
@@ -26,6 +27,9 @@ type GoDoc struct {
 }
 
 func main() {
+	// Cargar variables de entorno del archivo .env antes de cualquier inicialización
+	_ = godotenv.Load()
+
 	log.Println("=== Iniciando Motor de Ingesta Vectorial para GOland ===")
 
 	// 1. Cargar clave de API y URI de MongoDB

@@ -12,3 +12,7 @@ goland-server
 
 # Dependencias (si usaras Node en el frontend)
 node_modules/
+
+# Logs de trazabilidad
+*.log
+

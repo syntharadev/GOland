@@ -63,6 +63,7 @@ func IniciarMCPClient(clientName string, command string, args ...string) (*MCPCl
 	log.Printf("MCP Client [%s]: Iniciando servidor con comando: %s %v", clientName, command, args)
 
 	cmd := exec.Command(command, args...)
+	cmd.Env = os.Environ()
 	
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
