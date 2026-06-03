@@ -1,5 +1,11 @@
 .git
 .env
-goland.db
-ui/node_modules/
+node_modules/
+mcp_trace.log
+*.db
+*.sqlite
+docs/
 *.md
+server
+mcp-mongo
+ingest

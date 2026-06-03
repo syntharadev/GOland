@@ -9,6 +9,9 @@ goland.db
 # Binarios compilados
 goland-server
 *.exe
+server
+mcp-mongo
+ingest
 
 # Dependencias (si usaras Node en el frontend)
 node_modules/

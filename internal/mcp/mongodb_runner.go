@@ -3,6 +3,7 @@ package mcp
 import (
 	"fmt"
 	"log"
+	"os"
 )
 
 // ServidorMCPMongo es la instancia global del cliente MCP conectado al servidor de MongoDB
@@ -10,10 +11,17 @@ var ServidorMCPMongo *MCPClient
 
 // IniciarServidorMCPMongo arranca el servidor MCP nativo de MongoDB como subproceso
 func IniciarServidorMCPMongo() error {
-	log.Println("Iniciando Servidor MCP de MongoDB en Go como subproceso...")
+	var client *MCPClient
+	var err error
 
-	// Ejecutar nuestro propio binario/fuente MCP: go run cmd/mcp-mongo/main.go
-	client, err := IniciarMCPClient("mongodb", "go", "run", "cmd/mcp-mongo/main.go")
+	if os.Getenv("ENVIRONMENT") == "production" {
+		log.Println("Iniciando Servidor MCP de MongoDB en Go (Modo Producción - Binario compilado)...")
+		client, err = IniciarMCPClient("mongodb", "./mcp-mongo")
+	} else {
+		log.Println("Iniciando Servidor MCP de MongoDB en Go (Modo Desarrollo - go run)...")
+		client, err = IniciarMCPClient("mongodb", "go", "run", "cmd/mcp-mongo/main.go")
+	}
+
 	if err != nil {
 		return fmt.Errorf("fallo al arrancar el servidor MCP nativo de MongoDB: %w", err)
 	}

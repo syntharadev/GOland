@@ -1,34 +1,39 @@
-# ETAPA 1: Construcción (Builder)
-FROM golang:1.26.3-alpine AS builder
+# Etapa 1: Builder
+FROM golang:1.26-alpine AS builder
 
-# Configurar el directorio de trabajo
+# Instalar herramientas básicas de compilación
+RUN apk add --no-cache git gcc musl-dev
+
 WORKDIR /app
 
-# Descargar dependencias de Go
+# Copiar archivos de módulos
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copiar el código fuente completo
+# Copiar todo el código fuente
 COPY . .
 
-# Compilar el binario estático sin dependencias C (CGO_ENABLED=0)
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o goland-server ./cmd/server/main.go
+# Compilar de forma estática ambos binarios para Linux Alpine
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /app/server ./cmd/server/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /app/mcp-mongo ./cmd/mcp-mongo/main.go
 
-# ETAPA 2: Ejecución (Runner) - Imagen hiperligera
+# Etapa 2: Runner
 FROM alpine:latest
 
-# Añadir certificados raíz para que el servidor pueda conectarse a la API de Gemini vía HTTPS
-RUN apk --no-cache add ca-certificates
+# Instalar certificados CA y zona horaria
+RUN apk add --no-cache ca-certificates tzdata
 
-WORKDIR /root/
+WORKDIR /
 
-# Copiar el binario compilado desde la etapa builder
-COPY --from=builder /app/goland-server .
-# Copiar la carpeta estática del frontend (Agentic UI)
-COPY --from=builder /app/ui ./ui
+# Copiar los binarios compilados
+COPY --from=builder /app/server /server
+COPY --from=builder /app/mcp-mongo /mcp-mongo
 
-# Exponer el puerto
+# Copiar el directorio ui para servir archivos estáticos, videos e HTML
+COPY --from=builder /app/ui /ui
+
+# Exponer el puerto del servidor web
 EXPOSE 8080
 
-# Comando de arranque
-CMD ["./goland-server"]
+# Definir el comando de inicio
+ENTRYPOINT ["/server"]
