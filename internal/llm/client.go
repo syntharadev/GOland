@@ -4,7 +4,10 @@ import (
 	"context"
 	"log"
 
+	"gemini-go-platform/internal/config"
+
 	"github.com/google/generative-ai-go/genai"
+	"google.golang.org/api/option"
 )
 
 type GeminiClient struct {
@@ -12,13 +15,38 @@ type GeminiClient struct {
 }
 
 func InitClient(ctx context.Context) (*GeminiClient, error) {
-	log.Println("Mock: Inicializando GeminiClient (Fase 2 no proporcionada explícitamente)")
+	apiKey := config.GetGeminiAPIKey()
+	if apiKey == "" {
+		log.Println("Aviso: GEMINI_API_KEY no configurada. Operando en modo de simulación (MOCK).")
+		return &GeminiClient{
+			Client: nil,
+		}, nil
+	}
+
+	var opts []option.ClientOption
+	opts = append(opts, option.WithAPIKey(apiKey))
+
+	endpoint := config.GetOptiLLMEndpoint()
+	if endpoint != "" {
+		log.Printf("Conectando GeminiClient al proxy de OptiLLM: %s", endpoint)
+		opts = append(opts, option.WithEndpoint(endpoint))
+	} else {
+		log.Println("Conectando GeminiClient directamente al servidor oficial de Google.")
+	}
+
+	client, err := genai.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+
 	return &GeminiClient{
-		Client: nil,
+		Client: client,
 	}, nil
 }
 
 func (c *GeminiClient) Close() {
-	log.Println("Mock: Cerrando GeminiClient")
+	if c.Client != nil {
+		c.Client.Close()
+		log.Println("Cliente de Gemini cerrado correctamente.")
+	}
 }
-

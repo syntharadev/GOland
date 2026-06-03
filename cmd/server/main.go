@@ -14,6 +14,7 @@ import (
 	"gemini-go-platform/internal/auth"
 	"gemini-go-platform/internal/database"
 	"gemini-go-platform/internal/llm"
+	"gemini-go-platform/internal/mcp"
 )
 
 func main() {
@@ -23,6 +24,13 @@ func main() {
 		log.Fatalf("Error LLM: %v", err)
 	}
 	defer geminiClient.Close()
+
+	// Iniciar Servidor MCP MongoDB Atlas
+	if err := mcp.IniciarServidorMCPMongo(); err != nil {
+		log.Printf("Aviso: No se pudo arrancar el servidor MCP de MongoDB: %v. Operando en modo limitado / simulado.", err)
+	} else {
+		defer mcp.CerrarServidorMCPMongo()
+	}
 
 	// Inicialización de la Base de Datos Supabase (PostgreSQL) - NUNCA SQLite
 	dbConn := os.Getenv("DATABASE_URL")
