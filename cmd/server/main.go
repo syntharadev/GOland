@@ -99,15 +99,21 @@ func main() {
 		orquestadorHandler(w, r, geminiClient)
 	}))
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	addr := "0.0.0.0:" + port
+
 	server := &http.Server{
-		Addr:         ":8080",
+		Addr:         addr,
 		Handler:      mux,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	}
 
-	log.Println("🚀 Servidor en http://localhost:8080")
+	log.Printf("🚀 Servidor escuchando en http://%s\n", addr)
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("Fallo en servidor: %v", err)
 	}
