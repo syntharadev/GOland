@@ -12,7 +12,7 @@ COPY . .
 
 # Compilar los binarios
 RUN CGO_ENABLED=0 go build -o /app/goland-server ./cmd/server
-RUN CGO_ENABLED=0 go build -o /app/mcp-mongo ./cmd/mcp-mongo
+RUN CGO_ENABLED=0 go build -o /app/mcp-mongo-bin ./cmd/mcp-mongo
 
 # Etapa 2: Runner (Runtime)
 FROM alpine:latest
@@ -24,7 +24,7 @@ WORKDIR /
 
 # Copiar los binarios compilados desde el builder
 COPY --from=builder /app/goland-server ./goland-server
-COPY --from=builder /app/mcp-mongo ./mcp-mongo
+COPY --from=builder /app/mcp-mongo-bin ./mcp-mongo-bin
 
 # Copiar todos los archivos estáticos del frontend (incluyendo ui/html/app_GOland.html y ui/static)
 COPY --from=builder /app/ui ./ui

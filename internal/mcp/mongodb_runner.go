@@ -14,9 +14,9 @@ func IniciarServidorMCPMongo() error {
 	var client *MCPClient
 	var err error
 
-	if os.Getenv("ENVIRONMENT") == "production" {
+	if os.Getenv("ENV") == "production" {
 		log.Println("Iniciando Servidor MCP de MongoDB en Go (Modo Producción - Binario compilado)...")
-		client, err = IniciarMCPClient("mongodb", "./mcp-mongo")
+		client, err = IniciarMCPClient("mongodb", "./mcp-mongo-bin")
 	} else {
 		log.Println("Iniciando Servidor MCP de MongoDB en Go (Modo Desarrollo - go run)...")
 		client, err = IniciarMCPClient("mongodb", "go", "run", "cmd/mcp-mongo/main.go")
