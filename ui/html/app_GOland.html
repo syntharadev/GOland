@@ -4,62 +4,250 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GOland - Introducción</title>
-    <!-- Importación de Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
+        :root {
+            --space-bg: linear-gradient(135deg, #020617 0%, #0b0f19 50%, #0f172a 100%);
+            --color-cyan-go: #00add8;
+            --color-neon-pink: #ff2a85;
+            --color-neon-accent: #00c6ff;
+        }
+
         body, html {
             margin: 0;
             padding: 0;
             width: 100vw;
             height: 100vh;
-            background-color: #020617;
+            background: var(--space-bg);
             overflow: hidden;
             font-family: 'Outfit', sans-serif;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            color: #f8fafc;
         }
 
-        /* Contenedor de Video de pantalla completa */
-        .video-background {
+        /* Efecto de partículas de estrellas de fondo */
+        .stars {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
             z-index: 1;
-            overflow: hidden;
-        }
-
-        .video-background video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: brightness(0.85) contrast(1.1);
-        }
-
-        /* Overlay oscuro sutil para mejorar legibilidad del botón */
-        .video-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(2,6,23,0.4) 100%);
-            z-index: 2;
+            opacity: 0.7;
             pointer-events: none;
         }
 
-        /* Botón absoluto arriba a la derecha */
+        /* Resplandor ambiental de fondo */
+        .ambient-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 173, 216, 0.08) 0%, transparent 70%);
+            z-index: 2;
+            pointer-events: none;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Contenedor principal de fondo con un leve overlay */
+        .container-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(2,6,23,0.5) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Contenedor del título dinámico (Más pequeño y compacto) */
+        .header-container {
+            margin-top: 40px; 
+            margin-bottom: 5px;
+            z-index: 5;
+            text-align: center;
+            width: 100%;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .gonion-title {
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.6rem; /* Título más pequeño */
+            text-shadow: 0 2px 10px rgba(0, 173, 216, 0.5);
+            margin: 0;
+        }
+
+        /* --- CUADRÍCULA DE GOnions (Casillas más grandes) --- */
+        .gonion-grid {
+            position: relative;
+            z-index: 5;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px; /* Más espacio entre casillas */
+            width: 95%;
+            max-width: 1350px; /* Cuadrícula más ancha */
+            height: calc(100vh - 160px); /* Maximiza el alto disponible */
+            justify-content: center;
+            align-content: center;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        /* Estilo general de cada carta de personaje */
+        .gonion-card {
+            background: rgba(15, 23, 42, 0.5); /* Glassmorphism oscuro */
+            border: 2px solid rgba(0, 173, 216, 0.15);
+            border-radius: 24px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 8px 32px rgba(2, 6, 23, 0.3);
+            box-sizing: border-box;
+            overflow: hidden; /* Imprescindible para el zoom de la imagen */
+            backdrop-filter: blur(8px);
+        }
+
+        /* Estilo de la imagen estática dentro de la casilla */
+        .gonion-card img {
+            width: auto;
+            height: auto;
+            max-width: 85%;
+            max-height: 120px;
+            object-fit: contain;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+            z-index: 2;
+        }
+
+        /* --- INTERACCIONES ON HOVER (Casilla local) --- */
+        .gonion-card:hover {
+            border-color: rgba(0, 173, 216, 0.5);
+            box-shadow: 0 12px 40px rgba(0, 173, 216, 0.25);
+            background: rgba(15, 23, 42, 0.8);
+            transform: translateY(-4px);
+        }
+
+        /* Al hacer hover, la imagen de la casilla se amplía y difumina al fondo */
+        .gonion-card:hover img {
+            opacity: 0.15;
+            transform: scale(1.35); /* Zoom / Ampliar */
+        }
+
+        /* Contenedor de texto descriptivo (Centrado absoluto dentro de la casilla) */
+        .gonion-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.88rem;
+            opacity: 0; /* Oculto por defecto */
+            transition: opacity 0.3s ease-in-out;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .gonion-card:hover .gonion-text {
+            opacity: 1;
+        }
+
+        /* Estilos internos del texto */
+        .gonion-text h4 {
+            margin: 0 0 6px 0;
+            font-size: 1.15rem;
+            color: var(--color-neon-pink);
+            font-weight: 700;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+        }
+
+        .gonion-text p {
+            margin: 0 0 4px 0;
+            line-height: 1.4;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+        }
+
+        /* Subrayado de requisitos de acceso */
+        .gonion-text .requirement {
+            font-weight: 700;
+            color: var(--color-neon-accent);
+            display: block;
+            margin-top: 6px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+        }
+
+        /* --- CAPA GLOBAL PARA EL PERSONAJE CENTRADO Y GIGANTE (En background parallax) --- */
+        #global-preview-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(2, 6, 23, 0.2); /* Sutil oscurecimiento ambiental */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3; /* Detrás de la grid para evitar tapar el texto (grid tiene z-index: 5) */
+            opacity: 0;
+            pointer-events: none; /* Permite interactuar con la grid inferior */
+            transition: opacity 0.5s ease;
+        }
+
+        #global-preview-overlay.active {
+            opacity: 1;
+        }
+
+        #global-preview-overlay img {
+            max-width: 50vw;
+            max-height: 50vh;
+            object-fit: contain;
+            transform: scale(0.85);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            filter: drop-shadow(0 0 50px rgba(0, 173, 216, 0.45));
+            opacity: 0.45; /* Sutil fusión con el fondo espacial */
+        }
+
+        #global-preview-overlay.active img {
+            transform: scale(1.05);
+        }
+
+        /* --- BOTÓN SKIP (PRESERVADO) --- */
         .skip-container {
             position: absolute;
-            top: 30px;
+            top: 25px;
             right: 30px;
             z-index: 10;
         }
 
-        /* Clases base del botón Kawaii se definen aquí y en style.css */
         .boton-kawaii {
             display: inline-flex;
             align-items: center;
@@ -105,13 +293,108 @@
     </style>
 </head>
 <body>
-    <div class="video-background">
-        <video autoplay loop muted playsinline>
-            <source src="/videos/mp4.mp4" type="video/mp4">
-            Tu navegador no soporta la reproducción de video.
-        </video>
+    <div class="stars"></div>
+    <div class="ambient-glow"></div>
+    <div class="container-overlay"></div>
+
+    <div class="header-container">
+        <h1 class="gonion-title" id="gonion-main-title">Bienvenido al mundo de GOland y sus "habitantes" son los GOnions.</h1>
     </div>
-    <div class="video-overlay"></div>
+
+    <div class="gonion-grid">
+        
+        <div class="gonion-card">
+            <img src="/static/img/Bibliotecaria.png" alt="Bibliotecaria">
+            <div class="gonion-text">
+                <h4>Bibliotecaria</h4>
+                <p>Busca en la documentación de Go (Docs, standard library).</p>
+                <p>Soporte Pasivo. El Profesor la invoca si hay dudas sobre un paquete (fmt, net).</p>
+            </div>
+        </div>
+
+        <div class="gonion-card">
+            <img src="/static/img/Guardiana.png" alt="Guardiana">
+            <div class="gonion-text">
+                <h4>Guardiana</h4>
+                <p>Crea casos extremos (Edge cases) y rompe tu código. Es el Control de Calidad.</p>
+                <p>Bloquea el progreso hasta que tu código pase sus tests.</p>
+                <span class="requirement">Requisito Logro: Tests</span>
+            </div>
+        </div>
+
+        <div class="gonion-card">
+            <img src="/static/img/Mensajero.png" alt="Mensajero">
+            <div class="gonion-text">
+                <h4>Mensajero</h4>
+                <p>Gestiona el flujo de logs y notificaciones de sistema. Infraestructura.</p>
+                <p>No evalúa código, alimenta la "Terminal de Diagnóstico".</p>
+            </div>
+        </div>
+
+        <div class="gonion-card">
+            <img src="/static/img/Ingeniera.png" alt="Ingeniera">
+            <div class="gonion-text">
+                <h4>Ingeniera</h4>
+                <p>Analiza rendimiento, concurrencia (Goroutines) y memoria de tu proyecto. Líder Técnica.</p>
+                <p>Actúa después del Profesor si el código compila bien.</p>
+                <span class="requirement">Requisito Nivel 3 (Exp)</span>
+            </div>
+        </div>
+
+        <div class="gonion-card">
+            <img src="/static/img/Profesor.png" alt="Profesor">
+            <div class="gonion-text">
+                <h4>Profesor</h4>
+                <p>Te enseña y evalúa el código y la sintaxis del código.</p>
+                <p>También te da el contexto general. Es el referente del estudiante.</p>
+            </div>
+        </div>
+
+        <div class="gonion-card">
+            <img src="/static/img/Constructor.png" alt="Constructor">
+            <div class="gonion-text">
+                <h4>Constructor</h4>
+                <p>Diseña arquitectura de paquetes e interfaces sólidas. Se convierte en Arquitecto y se activa en proyectos multi-archivo.</p>
+                <p>Ignora scripts simples.</p>
+                <span class="requirement">Requisito Nivel 5 (Exp)</span>
+            </div>
+        </div>
+
+        <div class="gonion-card">
+            <img src="/static/img/Senior.png" alt="Senior">
+            <div class="gonion-text">
+                <h4>Senior</h4>
+                <p>Revisa las convenciones de nomenclatura (Effective Go).</p>
+                <p>Cambia a Mentora cuando hay mejoras a hacer sobre estilo, no sobre compilación.</p>
+                <span class="requirement">Requisito Logro: Foro</span>
+            </div>
+        </div>
+
+        <div class="gonion-card">
+            <img src="/static/img/Cronometradora.png" alt="Cronometradora">
+            <div class="gonion-text">
+                <h4>Cronometradora</h4>
+                <p>Especialista extremo en Big O notation y optimización de latencia.</p>
+                <p>Auditora Final. Turno de cierre. Solo habla si el código es ineficiente.</p>
+                <span class="requirement">Requisito Nivel 10 (Exp)</span>
+            </div>
+        </div>
+
+        <div class="gonion-card">
+            <img src="/static/img/Hacker.png" alt="Hacker">
+            <div class="gonion-text">
+                <h4>Hacker</h4>
+                <p>Enseña atajos, trucos no documentados y one-liners. Interrupción Aleatoria.</p>
+                <p>Puede saltarse su turno para dar un "Tip" rápido.</p>
+                <span class="requirement">Requisito Logro Oculto</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="global-preview-overlay">
+        <img id="overlay-img" src="" alt="GOnion Preview">
+    </div>
 
     <div class="skip-container">
         <a href="/login" class="boton-kawaii">
@@ -122,5 +405,41 @@
             </svg>
         </a>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Control de idioma del título
+            const userLanguage = navigator.language || navigator.userLanguage;
+            const titleElement = document.getElementById('gonion-main-title');
+
+            const titles = {
+                es: "Bienvenido al mundo de GOland y sus \"habitantes\" son los GOnions.",
+                en: "Welcome to the world of GOland, and its 'inhabitants' are the GOnions."
+            };
+
+            if (!userLanguage.startsWith('es')) {
+                titleElement.textContent = titles.en;
+            }
+
+            // 2. Lógica del Zoom Centrado en Pantalla
+            const overlay = document.getElementById('global-preview-overlay');
+            const overlayImg = document.getElementById('overlay-img');
+            const cards = document.querySelectorAll('.gonion-card');
+
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    const cardImg = card.querySelector('img');
+                    if (cardImg) {
+                        overlayImg.src = cardImg.src;
+                        overlay.classList.add('active');
+                    }
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    overlay.classList.remove('active');
+                });
+            });
+        });
+    </script>
 </body>
 </html>
