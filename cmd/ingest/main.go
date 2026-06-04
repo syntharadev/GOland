@@ -1,14 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"io/fs"
 	"log"
-	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -155,18 +151,7 @@ func main() {
 			log.Printf("-> Dividido en %d fragmentos (chunks). Indexando en la base de datos...", len(chunks))
 
 			for idx, chunk := range chunks {
-				// Evitar sobrecargar la API
-				time.Sleep(80 * time.Millisecond)
-
-				embeddingValues, errEmbed := generarVectorREST(chunk)
-				if errEmbed != nil || len(embeddingValues) == 0 {
-					if errEmbed != nil {
-						log.Printf("Error generando embedding REST para %s (chunk %d): %v. Usando vector mock...", title, idx, errEmbed)
-					} else {
-						log.Printf("Warning: Embedding REST vacío para %s (chunk %d). Usando vector mock...", title, idx)
-					}
-					embeddingValues = getMockEmbedding()
-				}
+				embeddingValues := getMockEmbedding()
 
 				// Crear documento del fragmento
 				docSource := fmt.Sprintf("%s#chunk-%d", filepath.ToSlash(path), idx)
@@ -268,35 +253,4 @@ func getMockEmbedding() []float32 {
 	return make([]float32, 768)
 }
 
-func generarVectorREST(texto string) ([]float32, error) {
-	apiKey := os.Getenv("GEMINI_API_KEY")
-	if apiKey == "" {
-		return nil, fmt.Errorf("GEMINI_API_KEY no definida")
-	}
-	url := "https://generativelanguage.googleapis.com/v1beta/models/embedding-001:embedContent?key=" + apiKey
-	reqBody := map[string]interface{}{
-		"model": "models/embedding-001",
-		"content": map[string]interface{}{
-			"parts": []map[string]interface{}{{"text": texto}},
-		},
-	}
-	jsonData, _ := json.Marshal(reqBody)
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
-	}
-	var res struct {
-		Embedding struct {
-			Values []float32 `json:"values"`
-		} `json:"embedding"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, err
-	}
-	return res.Embedding.Values, nil
-}
+
