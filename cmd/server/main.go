@@ -9,12 +9,12 @@ import (
 	"os"
 	"time"
 
-	"gemini-go-platform/internal/agents"
 	"gemini-go-platform/internal/api"
 	"gemini-go-platform/internal/auth"
 	"gemini-go-platform/internal/database"
 	"gemini-go-platform/internal/llm"
 	"gemini-go-platform/internal/mcp"
+	"gemini-go-platform/internal/router"
 
 	"github.com/joho/godotenv"
 )
@@ -94,19 +94,9 @@ func main() {
 	// Endpoint API para generar rutas de misiones del enjambre (protegido)
 	mux.HandleFunc("POST /api/generar-ruta", auth.RequireAuth(generarRutaHandler))
 
-	// Endpoint API para el agente La Bibliotecaria con RAG MCP MongoDB (protegido)
-	mux.HandleFunc("POST /api/agentes/bibliotecaria", auth.RequireAuth(func(w http.ResponseWriter, r *http.Request) {
-		bibliotecariaHandler(w, r, geminiClient)
-	}))
-
-	// Endpoint API para el agente El Constructor con validación CI/CD GitLab MCP (protegido)
-	mux.HandleFunc("POST /api/agentes/constructor", auth.RequireAuth(func(w http.ResponseWriter, r *http.Request) {
-		constructorHandler(w, r, geminiClient)
-	}))
-
-	// Endpoint API para el agente La Cronometradora con Observabilidad Elastic MCP (protegido)
-	mux.HandleFunc("POST /api/agentes/cronometradora", auth.RequireAuth(func(w http.ResponseWriter, r *http.Request) {
-		cronometradoraHandler(w, r, geminiClient)
+	// Endpoint Maestro del Orquestador de Enjambre (Swarm Router - protegido)
+	mux.HandleFunc("POST /api/orquestador", auth.RequireAuth(func(w http.ResponseWriter, r *http.Request) {
+		orquestadorHandler(w, r, geminiClient)
 	}))
 
 	server := &http.Server{
@@ -311,126 +301,61 @@ func generarRutaHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(resp)
 }
 
-// Estructuras para la consulta de La Bibliotecaria
-type BibliotecariaRequest struct {
-	Pregunta string `json:"pregunta"`
+// Estructuras para el Endpoint Maestro del Orquestador (Swarm Router)
+type OrquestadorRequest struct {
+	Mensaje string `json:"mensaje"`
+	Codigo  string `json:"codigo"`
 }
 
-type BibliotecariaResponse struct {
-	Respuesta string `json:"respuesta"`
+type OrquestadorResponse struct {
+	Escuadron int                   `json:"escuadron"`
+	Razon     string                `json:"razon"`
+	Mensajes  []router.MensajeSwarm `json:"mensajes"`
 }
 
-// Handler para la consulta del agente La Bibliotecaria con RAG MCP MongoDB
-func bibliotecariaHandler(w http.ResponseWriter, r *http.Request, geminiClient *llm.GeminiClient) {
+// Handler maestro para enrutar semánticamente y ejecutar los Swarms correspondientes
+func orquestadorHandler(w http.ResponseWriter, r *http.Request, geminiClient *llm.GeminiClient) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var req BibliotecariaRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
+	var req OrquestadorRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Error decodificando JSON", http.StatusBadRequest)
 		return
 	}
 
-	// Instanciar el agente de La Bibliotecaria
-	agent := agents.NewBibliotecariaAgent(geminiClient)
-
-	// Ejecutar la consulta de documentación (la cual maneja el Tool Calling e interacciona con el MCP de MongoDB)
-	respuesta, err := agent.ConsultarDocumentacion(r.Context(), req.Pregunta)
+	ctx := r.Context()
+	escuadron, razon, err := router.ClasificarIntencion(ctx, geminiClient, req.Mensaje, req.Codigo)
 	if err != nil {
-		log.Printf("Error en BibliotecariaAgent: %v", err)
-		http.Error(w, fmt.Sprintf("Error procesando la consulta: %v", err), http.StatusInternalServerError)
-		return
+		log.Printf("Aviso: Error en ClasificarIntencion: %v. Usando fallback Escuadrón 1.", err)
+		escuadron = 1
+		razon = "Interferencia cuántica (fallback automático a Swarm 1)."
 	}
 
-	resp := BibliotecariaResponse{
-		Respuesta: respuesta,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
-}
-
-// Estructuras para la validación de El Constructor
-type ConstructorRequest struct {
-	Codigo string `json:"codigo"`
-}
-
-type ConstructorResponse struct {
-	Respuesta string `json:"respuesta"`
-}
-
-// Handler para la validación de El Constructor con GitLab CI/CD MCP
-func constructorHandler(w http.ResponseWriter, r *http.Request, geminiClient *llm.GeminiClient) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var req ConstructorRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
+	mensajes, err := router.EjecutarSwarm(ctx, geminiClient, escuadron, req.Mensaje, req.Codigo)
 	if err != nil {
-		http.Error(w, "Error decodificando JSON", http.StatusBadRequest)
+		log.Printf("Error al ejecutar Swarm %d: %v", escuadron, err)
+		http.Error(w, fmt.Sprintf("Error ejecutando el enjambre de agentes: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	// Instanciar el agente de El Constructor
-	agent := agents.NewConstructorAgent(geminiClient)
-
-	// Ejecutar la validación del código (la cual maneja el Tool Calling e interacciona con el MCP de GitLab)
-	respuesta, err := agent.ValidarCodigo(r.Context(), req.Codigo)
-	if err != nil {
-		log.Printf("Error en ConstructorAgent: %v", err)
-		http.Error(w, fmt.Sprintf("Error en validación de código: %v", err), http.StatusInternalServerError)
-		return
+	// Inyectar mensaje inicial de "El Profesor" coordinando el flujo
+	introTexto := fmt.Sprintf("¡Excelente consulta! He clasificado tu solicitud y derivado la tarea al **Escuadrón %d** (%s). Dejaré que los especialistas se encarguen de responderte.", escuadron, razon)
+	profesorIntro := router.MensajeSwarm{
+		Nombre: "El Profesor",
+		Texto:  introTexto,
+		Avatar: "/static/img/Profesor.png",
 	}
 
-	resp := ConstructorResponse{
-		Respuesta: respuesta,
-	}
+	// Prepend
+	mensajes = append([]router.MensajeSwarm{profesorIntro}, mensajes...)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
-}
-
-// Estructuras para el agente La Cronometradora
-type CronometradoraRequest struct {
-	Codigo string `json:"codigo"`
-}
-
-type CronometradoraResponse struct {
-	Respuesta string `json:"respuesta"`
-}
-
-// Handler para el análisis de La Cronometradora con Elastic MCP
-func cronometradoraHandler(w http.ResponseWriter, r *http.Request, geminiClient *llm.GeminiClient) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var req CronometradoraRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		http.Error(w, "Error decodificando JSON", http.StatusBadRequest)
-		return
-	}
-
-	// Instanciar el agente de La Cronometradora
-	agent := agents.NewCronometradoraAgent(geminiClient)
-
-	// Ejecutar análisis de rendimiento (la cual maneja el Tool Calling e interacciona con el MCP de Elastic)
-	respuesta, err := agent.AnalizarRendimiento(r.Context(), req.Codigo)
-	if err != nil {
-		log.Printf("Error en CronometradoraAgent: %v", err)
-		http.Error(w, fmt.Sprintf("Error en análisis de observabilidad: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	resp := CronometradoraResponse{
-		Respuesta: respuesta,
+	resp := OrquestadorResponse{
+		Escuadron: escuadron,
+		Razon:     razon,
+		Mensajes:  mensajes,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
