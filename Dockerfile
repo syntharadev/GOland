@@ -10,27 +10,27 @@ RUN go mod download
 # Copiar todo el código fuente
 COPY . .
 
-# Compilar AMBOS binarios
-RUN CGO_ENABLED=0 go build -o /app/server ./cmd/server/main.go
-RUN CGO_ENABLED=0 go build -o /app/mcp-mongo ./cmd/mcp-mongo/main.go
+# Compilar los binarios
+RUN CGO_ENABLED=0 go build -o /app/goland-server ./cmd/server
+RUN CGO_ENABLED=0 go build -o /app/mcp-mongo ./cmd/mcp-mongo
 
-# Etapa 2: Runner
+# Etapa 2: Runner (Runtime)
 FROM alpine:latest
 
-# Instalar certificados CA
+# Instalar certificados CA para poder consultar APIs externas de forma segura
 RUN apk add --no-cache ca-certificates
 
 WORKDIR /
 
-# Copiar los binarios compilados al directorio raíz del Runner
-COPY --from=builder /app/server ./server
+# Copiar los binarios compilados desde el builder
+COPY --from=builder /app/goland-server ./goland-server
 COPY --from=builder /app/mcp-mongo ./mcp-mongo
 
-# Copiar el directorio ui para servir los archivos frontend
+# Copiar todos los archivos estáticos del frontend (incluyendo ui/html/app_GOland.html y ui/static)
 COPY --from=builder /app/ui ./ui
 
-# Exponer el puerto 8080
+# Exponer el puerto del servidor
 EXPOSE 8080
 
-# Configurar el ENTRYPOINT
-ENTRYPOINT ["./server"]
+# Definir el comando de arranque del servidor
+CMD ["./goland-server"]
