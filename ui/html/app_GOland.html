@@ -146,6 +146,14 @@
             transform: translateY(-4px);
         }
 
+        /* Al pasar el ratón por encima de una de las casillas, el resto se vuelve semi-transparente (visibilidad del 5%) */
+        .gonion-grid:hover .gonion-card {
+            opacity: 0.05;
+        }
+        .gonion-grid:hover .gonion-card:hover {
+            opacity: 1;
+        }
+
         /* Al hacer hover, la imagen de la casilla se amplía y difumina al fondo */
         .gonion-card:hover img {
             opacity: 0.15;
