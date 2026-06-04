@@ -273,9 +273,9 @@ func generarVectorREST(texto string) ([]float32, error) {
 	if apiKey == "" {
 		return nil, fmt.Errorf("GEMINI_API_KEY no definida")
 	}
-	url := "https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=" + apiKey
+	url := "https://generativelanguage.googleapis.com/v1beta/models/embedding-001:embedContent?key=" + apiKey
 	reqBody := map[string]interface{}{
-		"model": "models/text-embedding-004",
+		"model": "models/embedding-001",
 		"content": map[string]interface{}{
 			"parts": []map[string]interface{}{{"text": texto}},
 		},
