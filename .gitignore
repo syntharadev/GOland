@@ -7,11 +7,11 @@
 goland.db
 
 # Binarios compilados
-goland-server
+/goland-server
 *.exe
-server
-mcp-mongo
-ingest
+/server
+/mcp-mongo
+/ingest
 
 # Dependencias (si usaras Node en el frontend)
 node_modules/
@@ -19,3 +19,6 @@ node_modules/
 # Logs de trazabilidad
 *.log
 
+# Carpetas temporales de documentación de Go
+tmp_go_docs/
+_tmp_go_docs/

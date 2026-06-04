@@ -1,22 +1,24 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/google/generative-ai-go/genai"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"google.golang.org/api/option"
 )
 
 type GoDoc struct {
@@ -46,7 +48,7 @@ func main() {
 	}
 
 	// 2. Clonación Temporal del Repositorio de Go
-	tempDir := "./tmp_go_docs"
+	tempDir := "./_tmp_go_docs"
 	log.Println("Fase 1: Clonación del repositorio oficial de Go...")
 	if _, err := os.Stat(tempDir); err == nil {
 		log.Printf("Borrando carpeta temporal anterior '%s'...", tempDir)
@@ -59,9 +61,16 @@ func main() {
 	cmdClone := exec.Command("git", "clone", "--depth", "1", "https://github.com/golang/go.git", tempDir)
 	cmdClone.Stdout = os.Stdout
 	cmdClone.Stderr = os.Stderr
-	log.Println("Ejecutando: git clone --depth 1 https://github.com/golang/go.git ./tmp_go_docs")
+	log.Println("Ejecutando: git clone --depth 1 https://github.com/golang/go.git ./_tmp_go_docs")
 	if err := cmdClone.Run(); err != nil {
 		log.Fatalf("Error al clonar el repositorio de Go: %v", err)
+	}
+
+	// Eliminar carpetas innecesarias (como 'test') para evitar indexación y errores en el IDE
+	unusedDirs := []string{"test", "api", "misc", "lib", ".git", ".github"}
+	for _, dir := range unusedDirs {
+		dirPath := filepath.Join(tempDir, dir)
+		_ = os.RemoveAll(dirPath)
 	}
 
 	// Asegurar limpieza de la carpeta al finalizar la ejecución
@@ -92,18 +101,6 @@ func main() {
 	db := mongoClient.Database("goland_db")
 	coll := db.Collection("go_docs")
 
-	// 4. Inicializar Cliente Gemini
-	var genClient *genai.Client
-	var embedModel *genai.EmbeddingModel
-	if geminiKey != "" {
-		log.Println("Conectando directamente a Google API para Embeddings (Bypass de OptiLLM)...")
-		genClient, err = genai.NewClient(ctx, option.WithAPIKey(geminiKey))
-		if err != nil {
-			log.Fatalf("Error inicializando cliente de Gemini: %v", err)
-		}
-		defer genClient.Close()
-		embedModel = genClient.EmbeddingModel("text-embedding-004")
-	}
 
 	// 5. Explorar recursivamente las carpetas doc y src
 	dirsToExplore := []string{
@@ -161,19 +158,13 @@ func main() {
 				// Evitar sobrecargar la API
 				time.Sleep(80 * time.Millisecond)
 
-				var embeddingValues []float32
-				if embedModel != nil {
-					res, err := embedModel.EmbedContent(ctx, genai.Text(chunk))
-					if err != nil {
-						log.Printf("Error generando embedding para %s (chunk %d): %v. Usando vector mock...", title, idx, err)
-						embeddingValues = getMockEmbedding()
-					} else if res.Embedding == nil || len(res.Embedding.Values) == 0 {
-						log.Printf("Warning: Embedding vacío para %s (chunk %d). Usando vector mock...", title, idx)
-						embeddingValues = getMockEmbedding()
+				embeddingValues, errEmbed := generarVectorREST(chunk)
+				if errEmbed != nil || len(embeddingValues) == 0 {
+					if errEmbed != nil {
+						log.Printf("Error generando embedding REST para %s (chunk %d): %v. Usando vector mock...", title, idx, errEmbed)
 					} else {
-						embeddingValues = res.Embedding.Values
+						log.Printf("Warning: Embedding REST vacío para %s (chunk %d). Usando vector mock...", title, idx)
 					}
-				} else {
 					embeddingValues = getMockEmbedding()
 				}
 
@@ -272,11 +263,40 @@ func chunkText(text string, chunkSize int) []string {
 	return chunks
 }
 
-// getMockEmbedding genera un vector mock de 768 dimensiones.
+// getMockEmbedding genera un vector mock de 768 dimensiones (lleno de ceros).
 func getMockEmbedding() []float32 {
-	mockVector := make([]float32, 768)
-	for i := range mockVector {
-		mockVector[i] = 0.05
+	return make([]float32, 768)
+}
+
+func generarVectorREST(texto string) ([]float32, error) {
+	apiKey := os.Getenv("GEMINI_API_KEY")
+	if apiKey == "" {
+		return nil, fmt.Errorf("GEMINI_API_KEY no definida")
 	}
-	return mockVector
+	url := "https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=" + apiKey
+	reqBody := map[string]interface{}{
+		"model": "models/text-embedding-004",
+		"content": map[string]interface{}{
+			"parts": []map[string]interface{}{{"text": texto}},
+		},
+	}
+	jsonData, _ := json.Marshal(reqBody)
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
+	}
+	var res struct {
+		Embedding struct {
+			Values []float32 `json:"values"`
+		} `json:"embedding"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, err
+	}
+	return res.Embedding.Values, nil
 }
