@@ -96,7 +96,7 @@ func main() {
 	var genClient *genai.Client
 	var embedModel *genai.EmbeddingModel
 	if geminiKey != "" {
-		log.Println("Inicializando cliente de Google AI (EmbeddingModel)...")
+		log.Println("Conectando directamente a Google API para Embeddings (Bypass de OptiLLM)...")
 		genClient, err = genai.NewClient(ctx, option.WithAPIKey(geminiKey))
 		if err != nil {
 			log.Fatalf("Error inicializando cliente de Gemini: %v", err)
