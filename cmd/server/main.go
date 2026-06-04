@@ -25,6 +25,9 @@ func main() {
 		log.Println("Aviso: No se pudo cargar el archivo .env, usando variables del sistema.")
 	}
 
+	// Inicializar variables de configuración de autenticación y cookie store de forma segura
+	auth.Init()
+
 	ctx := context.Background()
 	geminiClient, err := llm.InitClient(ctx)
 	if err != nil {
@@ -49,10 +52,10 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	// Inyectamos tanto LLM como DB en el handler
-	mux.HandleFunc("GET /ws/swarm", func(w http.ResponseWriter, r *http.Request) {
+	// Inyectamos tanto LLM como DB en el handler y lo protegemos con autenticación
+	mux.HandleFunc("GET /ws/swarm", auth.RequireAuth(func(w http.ResponseWriter, r *http.Request) {
 		api.SwarmConnectionHandler(w, r, geminiClient, database)
-	})
+	}))
 
 	// Rutas de Autenticación OAuth2
 	mux.HandleFunc("GET /auth/google/login", auth.HandleGoogleLogin)
@@ -85,26 +88,26 @@ func main() {
 	// Ruta del nuevo Workspace "Pastel Sky" interactivo
 	mux.HandleFunc("GET /workspace", renderWorkspace)
 
-	// Endpoint API para chatear con el tutor Gemini
-	mux.HandleFunc("POST /api/chat", chatConGeminiHandler)
+	// Endpoint API para chatear con el tutor Gemini (protegido)
+	mux.HandleFunc("POST /api/chat", auth.RequireAuth(chatConGeminiHandler))
 
-	// Endpoint API para generar rutas de misiones del enjambre
-	mux.HandleFunc("POST /api/generar-ruta", generarRutaHandler)
+	// Endpoint API para generar rutas de misiones del enjambre (protegido)
+	mux.HandleFunc("POST /api/generar-ruta", auth.RequireAuth(generarRutaHandler))
 
-	// Endpoint API para el agente La Bibliotecaria con RAG MCP MongoDB
-	mux.HandleFunc("POST /api/agentes/bibliotecaria", func(w http.ResponseWriter, r *http.Request) {
+	// Endpoint API para el agente La Bibliotecaria con RAG MCP MongoDB (protegido)
+	mux.HandleFunc("POST /api/agentes/bibliotecaria", auth.RequireAuth(func(w http.ResponseWriter, r *http.Request) {
 		bibliotecariaHandler(w, r, geminiClient)
-	})
+	}))
 
-	// Endpoint API para el agente El Constructor con validación CI/CD GitLab MCP
-	mux.HandleFunc("POST /api/agentes/constructor", func(w http.ResponseWriter, r *http.Request) {
+	// Endpoint API para el agente El Constructor con validación CI/CD GitLab MCP (protegido)
+	mux.HandleFunc("POST /api/agentes/constructor", auth.RequireAuth(func(w http.ResponseWriter, r *http.Request) {
 		constructorHandler(w, r, geminiClient)
-	})
+	}))
 
-	// Endpoint API para el agente La Cronometradora con Observabilidad Elastic MCP
-	mux.HandleFunc("POST /api/agentes/cronometradora", func(w http.ResponseWriter, r *http.Request) {
+	// Endpoint API para el agente La Cronometradora con Observabilidad Elastic MCP (protegido)
+	mux.HandleFunc("POST /api/agentes/cronometradora", auth.RequireAuth(func(w http.ResponseWriter, r *http.Request) {
 		cronometradoraHandler(w, r, geminiClient)
-	})
+	}))
 
 	server := &http.Server{
 		Addr:         ":8080",

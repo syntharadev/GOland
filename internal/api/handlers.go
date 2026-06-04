@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"gemini-go-platform/internal/auth"
 	"gemini-go-platform/internal/database"
 	"gemini-go-platform/internal/llm"
 	"github.com/gorilla/websocket"
@@ -58,12 +59,22 @@ func SwarmConnectionHandler(w http.ResponseWriter, r *http.Request, gemini *llm.
 			go func(m MensajeEntrante) {
 				conn.WriteMessage(websocket.TextMessage, []byte(`{"status": "Autenticando perfil en base de datos..."}`))
 
+				// Obtener nick de la sesión autenticada por seguridad
+				session, _ := auth.Store.Get(r, "goland-session")
+				nick, _ := session.Values["user_nick"].(string)
+				if nick == "" {
+					nick = m.Nick
+				}
+				if nick == "" {
+					nick = "Estudiante"
+				}
+
 				nivelParaIniciar := 1
 				dominioParaIniciar := m.Dominio
 				objetivoParaIniciar := m.Objetivo
 
 				// COMPROBACIÓN DE SESIÓN (Login Inteligente)
-				userDB, err := database.GetUserProgress(m.Nick)
+				userDB, err := database.GetUserProgress(nick)
 				if err == nil {
 					// Usuario existe, restauramos sus datos
 					nivelParaIniciar = userDB.NivelActual
@@ -72,11 +83,11 @@ func SwarmConnectionHandler(w http.ResponseWriter, r *http.Request, gemini *llm.
 					conn.WriteMessage(websocket.TextMessage, []byte(`{"status": "Sesión encontrada. Restaurando progreso del Consejo..."}`))
 				} else {
 					// Guardamos al nuevo usuario en Nivel 1
-					database.SaveProgress(m.Nick, dominioParaIniciar, objetivoParaIniciar, nivelParaIniciar)
+					database.SaveProgress(nick, dominioParaIniciar, objetivoParaIniciar, nivelParaIniciar)
 				}
 
 				// Generamos el mundo con el nivel recuperado
-				config, err := gemini.GenerateSwarmWorld(context.Background(), m.Nick, m.NivelPrevio, dominioParaIniciar, objetivoParaIniciar, nivelParaIniciar)
+				config, err := gemini.GenerateSwarmWorld(context.Background(), nick, m.NivelPrevio, dominioParaIniciar, objetivoParaIniciar, nivelParaIniciar)
 				if err != nil {
 					log.Printf("Error de LLM: %v", err)
 					conn.WriteMessage(websocket.TextMessage, []byte(`{"error": "El Orquestador falló"}`))
@@ -99,7 +110,17 @@ func SwarmConnectionHandler(w http.ResponseWriter, r *http.Request, gemini *llm.
 			go func(m MensajeEntrante) {
 				conn.WriteMessage(websocket.TextMessage, []byte(`{"status": "Auditando código..."}`))
 
-				eval, err := gemini.EvaluateAndProgress(context.Background(), m.Nick, m.Dominio, m.Objetivo, m.NivelActual, m.Codigo)
+				// Obtener nick de la sesión autenticada por seguridad
+				session, _ := auth.Store.Get(r, "goland-session")
+				nick, _ := session.Values["user_nick"].(string)
+				if nick == "" {
+					nick = m.Nick
+				}
+				if nick == "" {
+					nick = "Estudiante"
+				}
+
+				eval, err := gemini.EvaluateAndProgress(context.Background(), nick, m.Dominio, m.Objetivo, m.NivelActual, m.Codigo)
 				if err != nil {
 					conn.WriteMessage(websocket.TextMessage, []byte(`{"error": "Fallo de evaluación"}`))
 					return
@@ -107,7 +128,7 @@ func SwarmConnectionHandler(w http.ResponseWriter, r *http.Request, gemini *llm.
 
 				// Hook de Persistencia: Si aprueba, guardamos en base de datos
 				if eval.Aprobado {
-					errDB := database.SaveProgress(m.Nick, m.Dominio, m.Objetivo, m.NivelActual+1)
+					errDB := database.SaveProgress(nick, m.Dominio, m.Objetivo, m.NivelActual+1)
 					if errDB != nil {
 						log.Printf("Aviso: No se pudo guardar progreso: %v", errDB)
 					}
