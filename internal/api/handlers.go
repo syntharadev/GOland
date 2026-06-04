@@ -57,7 +57,7 @@ func SwarmConnectionHandler(w http.ResponseWriter, r *http.Request, gemini *llm.
 		if msg.Tipo == "INIT_WORLD" {
 			go func(m MensajeEntrante) {
 				conn.WriteMessage(websocket.TextMessage, []byte(`{"status": "Autenticando perfil en base de datos..."}`))
-				
+
 				nivelParaIniciar := 1
 				dominioParaIniciar := m.Dominio
 				objetivoParaIniciar := m.Objetivo
@@ -85,11 +85,11 @@ func SwarmConnectionHandler(w http.ResponseWriter, r *http.Request, gemini *llm.
 
 				// Convertimos la respuesta nativa a JSON para el Frontend
 				respuestaJSON, _ := json.Marshal(map[string]interface{}{
-					"tipo": "WORLD_READY",
+					"tipo":             "WORLD_READY",
 					"nivel_recuperado": nivelParaIniciar, // Enviamos el nivel recuperado a la UI
-					"data": config,
+					"data":             config,
 				})
-				
+
 				conn.WriteMessage(websocket.TextMessage, respuestaJSON)
 			}(msg)
 		}
@@ -98,7 +98,7 @@ func SwarmConnectionHandler(w http.ResponseWriter, r *http.Request, gemini *llm.
 		if msg.Tipo == "EVALUATE_CODE" {
 			go func(m MensajeEntrante) {
 				conn.WriteMessage(websocket.TextMessage, []byte(`{"status": "Auditando código..."}`))
-				
+
 				eval, err := gemini.EvaluateAndProgress(context.Background(), m.Nick, m.Dominio, m.Objetivo, m.NivelActual, m.Codigo)
 				if err != nil {
 					conn.WriteMessage(websocket.TextMessage, []byte(`{"error": "Fallo de evaluación"}`))
@@ -117,7 +117,7 @@ func SwarmConnectionHandler(w http.ResponseWriter, r *http.Request, gemini *llm.
 					"tipo": "CODE_EVALUATED",
 					"data": eval,
 				})
-				
+
 				conn.WriteMessage(websocket.TextMessage, respuestaJSON)
 			}(msg)
 		}

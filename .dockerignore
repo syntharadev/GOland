@@ -1,11 +1,10 @@
 .git
-.env
 node_modules/
+.env
+*.md
+docs/
 mcp_trace.log
 *.db
 *.sqlite
-docs/
-*.md
 server
 mcp-mongo
-ingest

@@ -53,7 +53,7 @@ func main() {
 	mux.HandleFunc("GET /ws/swarm", func(w http.ResponseWriter, r *http.Request) {
 		api.SwarmConnectionHandler(w, r, geminiClient, database)
 	})
-	
+
 	// Rutas de Autenticación OAuth2
 	mux.HandleFunc("GET /auth/google/login", auth.HandleGoogleLogin)
 	mux.HandleFunc("GET /auth/google/callback", auth.HandleGoogleCallback)
@@ -200,10 +200,10 @@ func chatConGeminiHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Simulación adaptativa de respuesta del tutor (GOnion / Gemini)
 	var respuesta string
-	
+
 	// Generar respuesta simulada adaptativa
 	respuesta = "¡Hola! Estoy analizando tu pregunta cuántica: \"" + req.Mensaje + "\". "
-	
+
 	// Mocks inteligentes para demostrar coherencia
 	if containsKeyword(req.Mensaje, "variable", "declara", ":=") {
 		respuesta += "En Go, declarar una variable con := realiza inferencia automática de tipo y solo está permitida dentro de funciones. Si necesitas declarar una variable a nivel de paquete, debes usar obligatoriamente la sintaxis estándar: var nombre Tipo = valor. ¿Queda clara la diferencia? 🐹⚡"
@@ -433,9 +433,3 @@ func cronometradoraHandler(w http.ResponseWriter, r *http.Request, geminiClient 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 }
-
-
-
-
-
-

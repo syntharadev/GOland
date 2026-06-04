@@ -32,8 +32,8 @@ type JSONRPCResponse struct {
 
 // JSONRPCError representa un error en la respuesta JSON-RPC
 type JSONRPCError struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
 }
 
@@ -64,7 +64,7 @@ func IniciarMCPClient(clientName string, command string, args ...string) (*MCPCl
 
 	cmd := exec.Command(command, args...)
 	cmd.Env = os.Environ()
-	
+
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return nil, fmt.Errorf("error al obtener stdin pipe: %w", err)
@@ -122,7 +122,7 @@ func IniciarMCPClient(clientName string, command string, args ...string) (*MCPCl
 	// Inicializar protocolo MCP
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	
+
 	if err := client.Initialize(ctx); err != nil {
 		client.Close()
 		return nil, fmt.Errorf("error al inicializar protocolo MCP: %w", err)
@@ -140,7 +140,7 @@ func (m *MCPClient) listenStdout(clientName string) {
 	defer m.wg.Done()
 	for m.scanner.Scan() {
 		line := m.scanner.Bytes()
-		
+
 		// Registrar traza de entrada
 		m.writeTrace("IN", line)
 

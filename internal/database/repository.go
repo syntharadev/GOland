@@ -64,15 +64,15 @@ func (r *Repository) SaveProgress(nick, dominio, objetivo string, nivel int) err
 // GetUserProgress recupera el progreso de un usuario en Supabase
 func (r *Repository) GetUserProgress(nick string) (*UsuarioProgreso, error) {
 	query := `SELECT nick, dominio, objetivo, nivel_actual FROM progreso_usuarios WHERE nick = $1`
-	
+
 	row := r.db.QueryRow(query, nick)
-	
+
 	var u UsuarioProgreso
 	err := row.Scan(&u.Nick, &u.Dominio, &u.Objetivo, &u.NivelActual)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &u, nil
 }
 

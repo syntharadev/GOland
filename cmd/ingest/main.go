@@ -11,11 +11,11 @@ import (
 	"time"
 
 	"github.com/google/generative-ai-go/genai"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/api/option"
-	"github.com/joho/godotenv"
 )
 
 type GoDoc struct {

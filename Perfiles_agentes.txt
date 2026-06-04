@@ -8,3 +8,79 @@
 8. Senior	Logro: Foro	Revisa las convenciones de nomenclatura (Effective Go).	Mentora. Comenta junto al Profesor sobre estilo, no sobre compilación.
 9. Guardiana	Logro: Tests	Crea casos extremos (Edge cases) y rompe tu código.	Control de Calidad. Bloquea el progreso hasta que tu código pase sus tests.
 
+Instrucción Base (Para mantener el estilo en todas las imágenes)
+
+    Añade esto al principio de cada prompt: Isometric 3D illustration, cute Go gopher mascot (cyan blue color) standing on a small floating grey stone platform. Light blue sky with pixelated white clouds background. Clean vector-like shading, modern ui asset style, identical art style to "GOLAND ECOSYSTEM: CHARACTER ASSET SET".
+
+Los 12 GOnions: Especificaciones de Diseño
+
+Isometric 3D illustration, cute Go gopher mascot (cyan blue color) standing on a small floating grey stone platform. Light blue sky with pixelated white clouds background. Clean vector-like shading, modern ui asset style, identical art style to "GOLAND ECOSYSTEM: CHARACTER ASSET SET". 
+1. El Profesor (Professor)
+
+    Prompt específico: The Gopher is wearing round wire-rimmed glasses and holding a glowing holographic tablet with Go code on it. He has a wise, pedagogical expression.
+
+Isometric 3D illustration, cute Go gopher mascot (cyan blue color) standing on a small floating grey stone platform. Light blue sky with pixelated white clouds background. Clean vector-like shading, modern ui asset style, identical art style to "GOLAND ECOSYSTEM: CHARACTER ASSET SET". 
+
+2. La Bibliotecaria (Librarian)
+
+    Prompt específico: The Gopher is wearing reading glasses on the tip of its nose, holding a thick, ancient-looking book with the Go logo on the cover. A small neat stack of colorful books rests on the stone platform next to her.
+
+Isometric 3D illustration, cute Go gopher mascot (cyan blue color) standing on a small floating grey stone platform. Light blue sky with pixelated white clouds background. Clean vector-like shading, modern ui asset style, identical art style to "GOLAND ECOSYSTEM: CHARACTER ASSET SET". 
+
+3. El Mensajero (Messenger)
+
+    Prompt específico: The Gopher is wearing a classic messenger bag across its chest and a small cap. He is holding a digital package glowing with blue data lines, representing data packets or HTTP requests.
+
+Isometric 3D illustration, cute Go gopher mascot (cyan blue color) standing on a small floating grey stone platform. Light blue sky with pixelated white clouds background. Clean vector-like shading, modern ui asset style, identical art style to "GOLAND ECOSYSTEM: CHARACTER ASSET SET". 
+
+4. La Ingeniera (Engineer)
+
+    Prompt específico: The Gopher is wearing a white hard hat and a high-visibility yellow vest. She is unrolling and studying a blue architectural blueprint with cloud infrastructure diagrams on it.
+
+Isometric 3D illustration, cute Go gopher mascot (cyan blue color) standing on a small floating grey stone platform. Light blue sky with pixelated white clouds background. Clean vector-like shading, modern ui asset style, identical art style to "GOLAND ECOSYSTEM: CHARACTER ASSET SET". 
+
+5. El Constructor (Constructor)
+
+    Prompt específico: The Gopher is wearing a yellow construction helmet and a brown leather tool belt. He is actively using a wrench to assemble glowing blue holographic cubes that represent Go channels and goroutines.
+
+Isometric 3D illustration, cute Go gopher mascot (cyan blue color) standing on a small floating grey stone platform. Light blue sky with pixelated white clouds background. Clean vector-like shading, modern ui asset style, identical art style to "GOLAND ECOSYSTEM: CHARACTER ASSET SET". 
+
+6. La Cronometradora (Timekeeper)
+
+    Prompt específico: The Gopher is wearing a green translucent accountant's visor. She is holding a large, intricate pocket watch or a futuristic stopwatch, symbolizing timeouts, tickers, and exact execution times in Go.
+
+Isometric 3D illustration, cute Go gopher mascot (cyan blue color) standing on a small floating grey stone platform. Light blue sky with pixelated white clouds background. Clean vector-like shading, modern ui asset style, identical art style to "GOLAND ECOSYSTEM: CHARACTER ASSET SET". 
+
+7. El Hacker (Hacker)
+
+    Prompt específico: The Gopher is wearing a dark grey hoodie pulled up over its head (ears poking through). It wears dark sunglasses and is typing on a sleek black mechanical keyboard. Small green code strings float around it.
+
+Isometric 3D illustration, cute Go gopher mascot (cyan blue color) standing on a small floating grey stone platform. Light blue sky with pixelated white clouds background. Clean vector-like shading, modern ui asset style, identical art style to "GOLAND ECOSYSTEM: CHARACTER ASSET SET". 
+
+8. El Senior (Senior Developer)
+
+    Prompt específico: The Gopher has a small, well-groomed white beard (wizard-like). It looks slightly tired but wise, holding a steaming mug that says "World's Best Coder" in one paw and looking at a floating piece of complex Go syntax.
+
+Isometric 3D illustration, cute Go gopher mascot (cyan blue color) standing on a small floating grey stone platform. Light blue sky with pixelated white clouds background. Clean vector-like shading, modern ui asset style, identical art style to "GOLAND ECOSYSTEM: CHARACTER ASSET SET". 
+
+9. La Guardiana (Guardian)
+
+    Prompt específico: The Gopher is wearing lightweight, futuristic cyber-armor. She holds a glowing shield with a large "G" on it, representing type safety, error handling, and the Garbage Collector protecting the code.
+
+Isometric 3D illustration, cute Go gopher mascot (cyan blue color) standing on a small floating grey stone platform. Light blue sky with pixelated white clouds background. Clean vector-like shading, modern ui asset style, identical art style to "GOLAND ECOSYSTEM: CHARACTER ASSET SET". 
+
+10. El Estudiante (Student)
+
+    Prompt específico: The Gopher is wearing a classic colorful backpack. It is looking attentively at a modern silver laptop resting on its lap or on a small floating desk, typing carefully.
+
+Isometric 3D illustration, cute Go gopher mascot (cyan blue color) standing on a small floating grey stone platform. Light blue sky with pixelated white clouds background. Clean vector-like shading, modern ui asset style, identical art style to "GOLAND ECOSYSTEM: CHARACTER ASSET SET". 
+
+11. El Estudiante Junior (Junior Student)
+
+    Prompt específico: A slightly smaller, chubbier Gopher wearing a propeller beanie hat. It looks amazed and wide-eyed while looking at a basic "Hello World" block of code floating in front of it.
+
+Isometric 3D illustration, cute Go gopher mascot (cyan blue color) standing on a small floating grey stone platform. Light blue sky with pixelated white clouds background. Clean vector-like shading, modern ui asset style, identical art style to "GOLAND ECOSYSTEM: CHARACTER ASSET SET". 
+
+12. El Estudiante Pro (Pro Student)
+
+    Prompt específico: The Gopher is wearing modern over-ear gaming headphones. It has an intense, focused expression, interacting rapidly with two floating holographic screens filled with charts and Go code. A glowing energy drink sits on the stone platform.

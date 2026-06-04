@@ -8,10 +8,10 @@ import (
 
 // PipelineResult representa el veredicto del pipeline de GitLab CI
 type PipelineResult struct {
-	Status    string `json:"status"` // "success" o "failed"
-	Log       string `json:"log"`    // Salida detallada del compilador
-	JobURL    string `json:"job_url"`
-	Duration  string `json:"duration"`
+	Status   string `json:"status"` // "success" o "failed"
+	Log      string `json:"log"`    // Salida detallada del compilador
+	JobURL   string `json:"job_url"`
+	Duration string `json:"duration"`
 }
 
 // EjecutarPipelineGo simula la ejecución de un pipeline de CI/CD en GitLab que corre go build/test

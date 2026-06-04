@@ -3,32 +3,32 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"gemini-go-platform/internal/database"
+	"gemini-go-platform/internal/llm"
+	"github.com/gorilla/websocket"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
-	"gemini-go-platform/internal/database"
-	"gemini-go-platform/internal/llm"
-	"github.com/gorilla/websocket"
 )
 
 func TestSwarmConnectionHandler(t *testing.T) {
 	// Create mock gemini client
 	geminiClient, _ := llm.InitClient(context.Background())
-	
+
 	dbConn := os.Getenv("DATABASE_URL")
 	if dbConn == "" {
 		t.Skip("Saltando test de websocket porque DATABASE_URL no está configurada")
 		return
 	}
-	
+
 	database, err := database.InitDB(dbConn)
 	if err != nil {
 		t.Fatalf("No se pudo iniciar base de datos Supabase: %v", err)
 	}
 	defer database.Close()
-	
+
 	// Create a test server with our handler wrapper
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		SwarmConnectionHandler(w, r, geminiClient, database)
@@ -52,7 +52,7 @@ func TestSwarmConnectionHandler(t *testing.T) {
 		Objetivo: "Test Objetivo",
 	}
 	msg, _ := json.Marshal(msgObj)
-	
+
 	if err := ws.WriteMessage(websocket.TextMessage, msg); err != nil {
 		t.Fatalf("Failed to write message: %v", err)
 	}
@@ -67,13 +67,13 @@ func TestSwarmConnectionHandler(t *testing.T) {
 	if string(p1) != expected1 {
 		t.Errorf("Expected message %q, got %q", expected1, string(p1))
 	}
-	
+
 	// Read the second response (WORLD_READY)
 	_, p2, err := ws.ReadMessage()
 	if err != nil {
 		t.Fatalf("Failed to read message 2: %v", err)
 	}
-	
+
 	if !strings.Contains(string(p2), "WORLD_READY") {
 		t.Errorf("Expected WORLD_READY message, got %q", string(p2))
 	}

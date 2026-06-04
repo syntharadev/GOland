@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gorilla/sessions"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	"github.com/gorilla/sessions"
 )
 
 // Configuración de OAuth2
@@ -86,15 +86,15 @@ func HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 // HandleAuthStatus devuelve si el usuario está autenticado y su nick
 func HandleAuthStatus(w http.ResponseWriter, r *http.Request) {
 	session, _ := Store.Get(r, "goland-session")
-	
+
 	nick, ok := session.Values["user_nick"].(string)
 	authenticated, _ := session.Values["authenticated"].(bool)
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	if ok && authenticated {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"authenticated": true,
-			"nick": nick,
+			"nick":          nick,
 		})
 	} else {
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -112,4 +112,3 @@ func HandleLogout(w http.ResponseWriter, r *http.Request) {
 	session.Save(r, w)
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
-

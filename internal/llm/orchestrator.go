@@ -54,7 +54,7 @@ func (g *GeminiClient) GenerateSwarmWorld(ctx context.Context, nick, nivelExperi
 
 	model := g.Client.GenerativeModel("gemini-2.5-flash")
 	model.ResponseMIMEType = "application/json"
-	
+
 	systemPrompt := fmt.Sprintf(`Eres el Orquestador de 'GOland'. 
 Piloto: '%s' | Experiencia Previa: '%s'. 
 Dominio: %s | Objetivo: %s.
@@ -65,7 +65,7 @@ TAREAS:
 2. Genera el 'reto_actual' para el NIVEL %d explícitamente.
    - Haz que un GOnion reciba al piloto en el 'mensaje_gonion' reconociendo su nivel actual de progreso.
 Devuelve estrictamente el JSON con la estructura solicitada.`, nick, nivelExperiencia, dominio, objetivo, nivelActual, nivelActual)
-	
+
 	model.SystemInstruction = &genai.Content{
 		Parts: []genai.Part{genai.Text(systemPrompt)},
 	}
