@@ -3,6 +3,7 @@ package llm
 import (
 	"context"
 	"log"
+	"sync"
 
 	"gemini-go-platform/internal/config"
 
@@ -11,7 +12,8 @@ import (
 )
 
 type GeminiClient struct {
-	Client *genai.Client
+	Client       *genai.Client
+	ChatSessions sync.Map
 }
 
 func InitClient(ctx context.Context) (*GeminiClient, error) {

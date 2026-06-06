@@ -340,7 +340,14 @@ func orquestadorHandler(w http.ResponseWriter, r *http.Request, geminiClient *ll
 		razon = "Interferencia cuántica (fallback automático a Swarm 1)."
 	}
 
-	mensajes, err := router.EjecutarSwarm(ctx, geminiClient, escuadron, req.Mensaje, req.Codigo)
+	// Extraer el user_nick del usuario autenticado para individualizar las sesiones de chat de los agentes de Gemini
+	session, _ := auth.Store.Get(r, "goland-session")
+	userNick, ok := session.Values["user_nick"].(string)
+	if !ok || userNick == "" {
+		userNick = "Estudiante"
+	}
+
+	mensajes, err := router.EjecutarSwarm(ctx, geminiClient, escuadron, req.Mensaje, req.Codigo, userNick)
 	if err != nil {
 		log.Printf("Error al ejecutar Swarm %d: %v", escuadron, err)
 		http.Error(w, fmt.Sprintf("Error ejecutando el enjambre de agentes: %v", err), http.StatusInternalServerError)
