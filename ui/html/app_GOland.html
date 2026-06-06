@@ -219,40 +219,107 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(2, 6, 23, 0.4);
+            background: rgba(2, 6, 23, 0.75);
+            backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 3;
+            z-index: 20;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s ease;
         }
 
         #global-preview-overlay.active {
             opacity: 1;
+            pointer-events: auto; /* Permite clics para cerrarlo */
+        }
+
+        .preview-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            max-width: 90%;
+            max-height: 90vh;
+            gap: 20px;
+            z-index: 21;
         }
 
         #global-preview-overlay img {
-            max-width: 50vw;
-            max-height: 50vh;
+            max-width: 80vw;
+            max-height: 40vh;
             object-fit: contain;
-            transform: scale(0.85);
+            transform: scale(0.9);
             transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            filter: drop-shadow(0 0 50px rgba(0, 173, 216, 0.45));
-            opacity: 0.45;
+            filter: drop-shadow(0 0 50px rgba(0, 173, 216, 0.4));
+            opacity: 1.0;
         }
 
         #global-preview-overlay.active img {
-            transform: scale(1.05);
+            transform: scale(1.0);
             opacity: 1.0;
+        }
+
+        .overlay-text {
+            background: rgba(15, 23, 42, 0.85);
+            border: 2px solid rgba(0, 173, 216, 0.3);
+            border-radius: 20px;
+            padding: 20px 25px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 50px rgba(2, 6, 23, 0.7);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-sizing: border-box;
+        }
+
+        #global-preview-overlay.active .overlay-text {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .overlay-text h4 {
+            margin: 0 0 10px 0;
+            font-size: 1.4rem;
+            background: linear-gradient(to right, var(--color-neon-pink), var(--color-cyan-go));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            font-weight: 700;
+        }
+
+        .overlay-text p {
+            margin: 0 0 8px 0;
+            line-height: 1.5;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            color: #f1f5f9;
+            font-size: 0.95rem;
+        }
+
+        .overlay-text .requirement {
+            font-weight: 700;
+            color: var(--color-neon-accent);
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(0, 198, 255, 0.3);
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: rgba(0, 198, 255, 0.05);
         }
 
         .skip-container {
             position: absolute;
             top: 25px;
             right: 30px;
-            z-index: 10;
+            z-index: 25; /* Colocado sobre el overlay */
         }
 
         .boton-kawaii {
@@ -408,7 +475,10 @@
     <div class="footer-instruction">Haz click sobre cada GOnion para ver un resumen de sus funciones</div>
 
     <div id="global-preview-overlay">
-        <img id="overlay-img" src="" alt="GOnion Preview">
+        <div class="preview-content">
+            <img id="overlay-img" src="" alt="GOnion Preview">
+            <div id="overlay-text-container" class="overlay-text"></div>
+        </div>
     </div>
 
     <div class="skip-container">
@@ -441,6 +511,7 @@
             const cards = document.querySelectorAll('.gonion-card');
             const overlay = document.getElementById('global-preview-overlay');
             const overlayImg = document.getElementById('overlay-img');
+            const overlayTextContainer = document.getElementById('overlay-text-container');
 
             // Click en cada tarjeta
             cards.forEach(card => {
@@ -459,10 +530,12 @@
                         card.classList.add('is-active');
                         grid.classList.add('has-active');
                         
-                        // Mostrar imagen gigante en el fondo
+                        // Mostrar imagen gigante y su texto descriptivo en el overlay
                         const cardImg = card.querySelector('img');
-                        if (cardImg) {
+                        const cardText = card.querySelector('.gonion-text');
+                        if (cardImg && cardText) {
                             overlayImg.src = cardImg.src;
+                            overlayTextContainer.innerHTML = cardText.innerHTML;
                             overlay.classList.add('active');
                         }
                     }
